@@ -98,6 +98,17 @@ body.ko .cols,body.en .cols{grid-template-columns:1fr}
 .more{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gold);border:1px solid var(--edge);border-radius:3px;padding:5px 10px;margin-top:10px;text-decoration:none;transition:border-color .15s}
 .more:hover{border-color:var(--gold)}
 
+.g{color:inherit;text-decoration:none;border-bottom:1px dotted var(--gold);cursor:help}
+.g:hover{color:var(--gold)}
+.gl{margin:0}
+.gent{padding:11px 6px;border-bottom:1px solid rgba(28,91,68,.5);transition:background .4s}
+.gent:last-child{border-bottom:0}
+.gent.hit{background:var(--board-3);outline:1px solid var(--gold);outline-offset:-1px;border-radius:3px}
+.gent dt{font-family:var(--mono);font-size:13px;color:var(--gold);margin:0 0 3px}
+.gent dt .ge{color:var(--copper);font-size:11px;letter-spacing:.04em;margin-left:9px}
+.gent dd{margin:0;font-size:13.5px}
+.gent dd .en{display:block;color:var(--silk-dim)}
+
 #detail{position:fixed;inset:0;background:var(--board);z-index:60;overflow-y:auto;display:none}
 #detail.show{display:block}
 body.detail-open{overflow:hidden}
@@ -144,6 +155,7 @@ body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
   body{background:#fff;color:#111;font-size:9.2pt}
   .wrap{max-width:none;padding:0}
   .bar,.railwrap,.foot,svg.trace,#totop,#printnote,.rm .dtl,#detail,.more{display:none!important}
+  .g{border-bottom:none;color:inherit}
   .eyebrow{color:#666}
   h1{font-size:16pt;color:#111}
   .mapwrap{overflow:visible}
@@ -257,6 +269,7 @@ body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
 
 <div class="foot">
   <span>← → 방향키로 이동 · ARROW KEYS TO NAVIGATE</span>
+  <span><a class="g" href="#d/glossary">용어집 GLOSSARY</a></span>
   <span>구리 트레이스 = 판넬 이동 경로 · 비아 = 층간 이송</span>
 </div>
 </div>
@@ -426,6 +439,41 @@ var MAT=[
 ["VT-901","Ventec (TW/CN)","Polyimide + woven glass","≈4.4","≈0.015","1 hi-temp","High-temperature polyimide for aerospace, defence and downhole boards; comparable to Arlon 85N."]
 ];
 
+/* Glossary — one list feeds every hyperlink. To add a word, add one
+   entry here: t = the term as it appears in Korean text, ge = short
+   English name, m = extra spellings to match (e.g. the English word),
+   ko/en = the descriptions. Every occurrence of t or m in the step list
+   and the detail pages automatically becomes a link to the glossary. */
+var GLOSSARY=[
+{t:"스루홀",ge:"Through-hole (PTH)",m:["through-hole"],
+ ko:"기판을 관통하도록 뚫고 내벽을 구리로 도금한 구멍. 층과 층, 또는 부품 리드와 기판을 전기적으로 연결한다.",
+ en:"A hole drilled right through the board with copper plated onto its wall, electrically connecting the layers — or a component lead — to the board."},
+{t:"비아",ge:"Via",m:["via hole"],
+ ko:"신호를 다른 층으로 전달하기 위한 작은 도금 관통 구멍. 부품 장착용이 아니라 배선용이라는 점이 부품용 스루홀과 다르다.",
+ en:"A small plated hole whose only job is to carry a signal from one layer to another — wiring, not component mounting."},
+{t:"CCL",ge:"Copper-clad laminate",m:["동박적층판"],
+ ko:"절연 기재의 양면(또는 한 면)에 동박을 붙여 만든 원판. 모든 PCB의 출발 재료.",
+ en:"The raw laminate: an insulating substrate with copper foil bonded to one or both faces. Every PCB starts as one."},
+{t:"동박",ge:"Copper foil",m:["copper foil"],
+ ko:"회로가 되는 얇은 구리 막. 두께는 oz 단위로 부른다 (1 oz ≈ 35 µm).",
+ en:"The thin copper sheet that becomes the circuitry, specified in ounces (1 oz ≈ 35 µm)."},
+{t:"프리프레그",ge:"Prepreg (PP)",m:["prepreg"],
+ ko:"수지를 함침시켜 반경화 상태로 둔 유리섬유 직물. 가열·가압하면 녹아 붙어 층 사이의 접착제가 된다.",
+ en:"Glass cloth impregnated with resin and only half-cured; under heat and pressure it flows and glues the layers together."},
+{t:"에칭",ge:"Etching",m:["etch"],
+ ko:"약품으로 불필요한 구리를 녹여 없애 회로 패턴만 남기는 공정.",
+ en:"Chemically dissolving away the unwanted copper so only the circuit pattern remains."},
+{t:"솔더마스크",ge:"Solder mask (PSR)",m:["solder mask"],
+ ko:"납땜할 곳만 남기고 기판 표면을 덮는 절연 코팅. 보드의 색(주로 초록)이 바로 이것.",
+ en:"The insulating coating that covers the board except where solder belongs — it is what gives a board its colour."},
+{t:"AOI",ge:"Automated optical inspection",
+ ko:"카메라로 회로 패턴을 촬영해 설계 데이터(Gerber)와 비교하는 자동 검사.",
+ en:"A camera-based inspection that photographs the copper pattern and compares it against the Gerber design data."},
+{t:"AMR",ge:"Autonomous mobile robot",
+ ko:"공장 안에서 자재를 스스로 실어 나르는 이송 로봇.",
+ en:"A self-driving robot that carries material between rooms and floors."}
+];
+
 /* Detail pages, keyed by step number (or a name, for reference pages
    reached by link). A "상세 페이지 DETAIL PAGE" button appears
    automatically on any step listed here; add a new entry to add a page.
@@ -579,12 +627,45 @@ var DETAILS={
     e:"HF-350F — confirm against Taconic's current hydrocarbon range (HF-300F / HF-340 / HF-341)"},
   ]},
  ]},
+
+"glossary":{
+ glossary:true,
+ eyebrow:"GLOSSARY — 용어집",
+ tko:"용어집", ten:"Glossary",
+ lko:"본문 곳곳의 금색 점선 밑줄 단어를 누르면 이 페이지로 옵니다. 코드의 GLOSSARY 목록에 단어와 설명을 추가하면 본문 모든 곳에서 자동으로 링크됩니다.",
+ len:"Gold dotted-underline words throughout the page link here. Add a word and its description to the GLOSSARY list in the code and every occurrence links automatically.",
+ sections:[]},
 };
 
 var FLOOR={office3:0,pack3:0,psr3:0,aoi2:1,exp2:1,wet2:1,dsm2:1,plt2:1,wh1:2,lay1:2,prs1:2,trm1:2,drl1:2,emma1:2,out:3};
 var idx=0, timer=null, map=document.getElementById('map'), svg=null;
 
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+/* Auto-link glossary terms. mark() escapes like esc() and then wraps any
+   occurrence of a glossary term (or its m aliases) in a link to #d/glossary.
+   ASCII aliases match on word boundaries, case-insensitively. */
+var GKEYS=[];
+for(var gi=0;gi<GLOSSARY.length;gi++){
+  var gks=[GLOSSARY[gi].t].concat(GLOSSARY[gi].m||[]);
+  for(var gj=0;gj<gks.length;gj++) GKEYS.push({k:gks[gj],t:GLOSSARY[gi].t});
+}
+GKEYS.sort(function(a,b){return b.k.length-a.k.length});
+var GRE=new RegExp(GKEYS.map(function(x){
+  var q=x.k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return /^[\x00-\x7F]+$/.test(x.k)?'\\b'+q+'s?\\b':q;
+}).join('|'),'gi');
+function mark(s){
+  return esc(s).replace(GRE,function(w){
+    var lw=w.toLowerCase(), sg=lw.replace(/s$/,'');
+    for(var i=0;i<GKEYS.length;i++){
+      var gk=GKEYS[i].k.toLowerCase();
+      if(gk===lw||gk===sg)
+        return '<a class="g" href="#d/glossary/'+encodeURIComponent(GKEYS[i].t)+'">'+w+'</a>';
+    }
+    return w;
+  });
+}
 
 function buildList(){
   var h='';
@@ -595,8 +676,8 @@ function buildList(){
       +'<div class="hd"><div><p class="h4 ko">'+esc(s.ko)+'</p><p class="h4 en" style="display:none">'+esc(s.en)+'</p>'
       +'<p class="h5 ko">'+esc(s.en)+'</p></div>'
       +'<span class="loc"><span class="ko">'+esc(s.lk)+'</span> <span class="en">'+esc(s.le)+'</span></span></div>'
-      +'<div class="cols"><ul class="ko">'+s.k.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'
-      +'<ul class="en">'+s.e.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'
+      +'<div class="cols"><ul class="ko">'+s.k.map(function(x){return '<li>'+mark(x)+'</li>'}).join('')+'</ul>'
+      +'<ul class="en">'+s.e.map(function(x){return '<li>'+mark(x)+'</li>'}).join('')+'</ul></div>'
       +(s.mk?'<div class="mv"><span class="ko">'+esc(s.mk)+'</span><span class="en">'+esc(s.me)+'</span></div>':'')
       +(DETAILS[s.n]?'<a class="more" href="#d/'+(DETAILS[s.n].first||s.n)+'">상세 페이지 DETAIL PAGE →</a>':'')
       +'</div></div>';
@@ -608,20 +689,25 @@ function buildList(){
     els[j].addEventListener('click',function(){go(+this.dataset.i)});
     els[j].addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go(+this.dataset.i)}});
   }
-  var mores=document.querySelectorAll('.more');
+  var mores=document.querySelectorAll('.more,.g');
   for(var m2=0;m2<mores.length;m2++){
     mores[m2].addEventListener('click',function(ev){ev.stopPropagation()});
   }
 }
 
-function cellHTML(c){
-  if(c&&typeof c==='object') return '<span class="ko">'+esc(c.k)+'</span><span class="en">'+esc(c.e)+'</span>';
-  return esc(String(c));
+function cellHTML(c,f){
+  f=f||esc;
+  if(c&&typeof c==='object') return '<span class="ko">'+f(c.k)+'</span><span class="en">'+f(c.e)+'</span>';
+  return f(String(c));
 }
 
-function openDetail(n){
+function openDetail(n,term){
   var D=DETAILS[n];
-  var h='<div class="dwrap"><a class="back" href="#">← 돌아가기 BACK</a>'
+  var mk=D.glossary?esc:mark;
+  var back=D.glossary
+   ?'<a class="back" href="#" onclick="if(history.length>1){history.back();return false}">← 돌아가기 BACK</a>'
+   :'<a class="back" href="#">← 돌아가기 BACK</a>';
+  var h='<div class="dwrap">'+back
    +'<p class="eyebrow">'+esc(D.eyebrow||('STEP '+n+' — DETAIL'))+'</p>'
    +'<h1><span class="ko">'+esc(D.tko)+'</span> <span class="alt en">'+esc(D.ten)+'</span></h1>';
   if(D.lko) h+='<p class="lede"><span class="ko">'+esc(D.lko)+'</span> <span class="en">'+esc(D.len)+'</span></p>';
@@ -632,12 +718,12 @@ function openDetail(n){
     h+='<div class="dsec"><h3><span class="ko">'+esc(sec.hko)+'</span> <span class="en">'+esc(sec.hen)+'</span></h3>';
     if(sec.pko){
       var pk=[].concat(sec.pko), pe=[].concat(sec.pen);
-      h+='<div class="cols dpara"><div class="ko">'+pk.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')
-       +'</div><div class="en">'+pe.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')+'</div></div>';
+      h+='<div class="cols dpara"><div class="ko">'+pk.map(function(x){return '<p>'+mk(x)+'</p>'}).join('')
+       +'</div><div class="en">'+pe.map(function(x){return '<p>'+mk(x)+'</p>'}).join('')+'</div></div>';
     }
     if(sec.rows){
-      h+='<div class="cols"><ul class="ko">'+sec.rows.map(function(r){return '<li>'+esc(r.k)+'</li>'}).join('')+'</ul>'
-       +'<ul class="en">'+sec.rows.map(function(r){return '<li>'+esc(r.e)+'</li>'}).join('')+'</ul></div>';
+      h+='<div class="cols"><ul class="ko">'+sec.rows.map(function(r){return '<li>'+mk(r.k)+'</li>'}).join('')+'</ul>'
+       +'<ul class="en">'+sec.rows.map(function(r){return '<li>'+mk(r.e)+'</li>'}).join('')+'</ul></div>';
     }
     if(sec.table){
       var nw=sec.table.nw||[];
@@ -645,19 +731,40 @@ function openDetail(n){
        +sec.table.head.map(function(c){return '<th>'+cellHTML(c)+'</th>'}).join('')
        +'</tr></thead><tbody>'
        +sec.table.rows.map(function(row){
-          return '<tr>'+row.map(function(c,ci){return '<td'+(nw.indexOf(ci)>-1?' class="nw"':'')+'>'+cellHTML(c)+'</td>'}).join('')+'</tr>';
+          return '<tr>'+row.map(function(c,ci){return '<td'+(nw.indexOf(ci)>-1?' class="nw"':'')+'>'+cellHTML(c,mk)+'</td>'}).join('')+'</tr>';
         }).join('')
        +'</tbody></table></div>';
     }
-    if(sec.nko) h+='<p class="dnote"><span class="ko">'+esc(sec.nko)+'</span> <span class="en">'+esc(sec.nen)+'</span></p>';
+    if(sec.nko) h+='<p class="dnote"><span class="ko">'+mk(sec.nko)+'</span> <span class="en">'+mk(sec.nen)+'</span></p>';
     h+='</div>';
   }
-  h+='</div><a class="back" href="#">← 돌아가기 BACK</a></div>';
+  if(D.glossary){
+    h+='<div class="dsec"><h3><span class="ko">용어</span> <span class="en">Terms</span></h3><dl class="gl">';
+    for(var g2=0;g2<GLOSSARY.length;g2++){
+      var G=GLOSSARY[g2];
+      h+='<div class="gent" data-t="'+esc(G.t)+'"><dt>'+esc(G.t)+(G.ge?'<span class="ge">'+esc(G.ge)+'</span>':'')+'</dt>'
+       +'<dd><span class="ko">'+esc(G.ko)+'</span> <span class="en">'+esc(G.en)+'</span></dd></div>';
+    }
+    h+='</dl></div>';
+  }
+  h+='</div>'+back+'</div>';
   var el=document.getElementById('detail');
   el.innerHTML=h;
   el.classList.add('show');
   el.scrollTop=0;
   document.body.classList.add('detail-open');
+  if(term){
+    var ents=el.querySelectorAll('.gent');
+    for(var t2=0;t2<ents.length;t2++){
+      if(ents[t2].getAttribute('data-t')===term){
+        var tgt=ents[t2];
+        tgt.classList.add('hit');
+        el.scrollTop=Math.max(0,tgt.offsetTop-90);
+        setTimeout(function(){tgt.classList.remove('hit')},2200);
+        break;
+      }
+    }
+  }
 }
 
 function closeDetail(){
@@ -666,8 +773,12 @@ function closeDetail(){
 }
 
 function checkHash(){
-  var m=location.hash.match(/^#d\/(.+)$/);
-  if(m&&DETAILS[m[1]]) openDetail(m[1]);
+  var m=location.hash.match(/^#d\/([^\/]+)(?:\/(.+))?$/);
+  if(m&&DETAILS[m[1]]){
+    var t=null;
+    if(m[2]){try{t=decodeURIComponent(m[2])}catch(e){}}
+    openDetail(m[1],t);
+  }
   else closeDetail();
 }
 window.addEventListener('hashchange',checkHash);
