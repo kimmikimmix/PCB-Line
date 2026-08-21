@@ -429,12 +429,14 @@ var MAT=[
 /* Detail pages, keyed by step number (or a name, for reference pages
    reached by link). A "상세 페이지 DETAIL PAGE" button appears
    automatically on any step listed here; add a new entry to add a page.
+   A "first" key makes the step's button open that page instead of its own.
    Sections may carry paired rows (k/e), paragraphs (pko/pen), a table
    ({head,rows,nw}) and a note (nko/nen). */
 var DETAILS={
 "02":{
+ first:"mat",
  tko:"창고 · 재단 — 상세 정보", ten:"Material store & cutting — detailed information",
- links:[{href:"#d/mat",txt:"원자재(CCL) 참고 가이드 · CCL REFERENCE GUIDE →"}],
+ links:[{href:"#d/mat",txt:"← 원자재(CCL) 참고 가이드 · CCL REFERENCE GUIDE"}],
  sections:[
   {hko:"코어 / 원판(CCL) 종류", hen:"Types of core / raw laminate (CCL)", rows:[
    {k:"FR-4 (유리섬유 에폭시) — 가장 널리 쓰이는 표준 원판, Tg 130–140°C",
@@ -475,7 +477,7 @@ var DETAILS={
  tko:"원자재(CCL) 참고 가이드", ten:"Copper-clad laminate reference guide",
  lko:"승인 리스트의 모든 원판 — 무엇이고, 비용이 어떻게 되고, 언제 쓰는가. PCB 제조 입문자 기준으로 정리.",
  len:"Every laminate on our approved list — what it is, what it costs you, and when to use it. Written for someone new to PCB manufacturing.",
- links:[{href:"#d/02",txt:"← 창고 · 재단 상세 · STEP 02 DETAIL"}],
+ links:[{href:"#d/02",txt:"창고 · 재단 상세 (원판 종류·두께·보관) · STORE & CUTTING DETAIL →"}],
  sections:[
   {hko:"1. CCL이란 무엇인가", hen:"1. Start here: what a CCL actually is",
    pko:["PCB는 구리 전선으로 만드는 것이 아닙니다. 절연 기재의 겉면에 동박(구리 호일)을 붙인 평판에서, 필요 없는 구리를 화학적으로 에칭해 회로를 만듭니다. 이 '절연체 + 동박' 판이 바로 CCL(Copper-Clad Laminate, 동박적층판)입니다.",
@@ -596,7 +598,7 @@ function buildList(){
       +'<div class="cols"><ul class="ko">'+s.k.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'
       +'<ul class="en">'+s.e.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'
       +(s.mk?'<div class="mv"><span class="ko">'+esc(s.mk)+'</span><span class="en">'+esc(s.me)+'</span></div>':'')
-      +(DETAILS[s.n]?'<a class="more" href="#d/'+s.n+'">상세 페이지 DETAIL PAGE →</a>':'')
+      +(DETAILS[s.n]?'<a class="more" href="#d/'+(DETAILS[s.n].first||s.n)+'">상세 페이지 DETAIL PAGE →</a>':'')
       +'</div></div>';
   }
   document.getElementById('steps').innerHTML=h;
