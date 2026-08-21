@@ -95,6 +95,18 @@ body.en .ko{display:none}
 body.ko .cols,body.en .cols{grid-template-columns:1fr}
 .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--edge);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--silk-dim);opacity:.65;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
+.more{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gold);border:1px solid var(--edge);border-radius:3px;padding:5px 10px;margin-top:10px;text-decoration:none;transition:border-color .15s}
+.more:hover{border-color:var(--gold)}
+
+#detail{position:fixed;inset:0;background:var(--board);z-index:60;overflow-y:auto;display:none}
+#detail.show{display:block}
+body.detail-open{overflow:hidden}
+#detail .dwrap{max-width:1080px;margin:0 auto;padding:32px 24px 72px}
+.back{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--silk);border:1px solid var(--edge);border-radius:3px;padding:8px 13px;text-decoration:none;margin-bottom:26px;transition:border-color .15s,color .15s}
+.back:hover{border-color:var(--copper);color:var(--copper)}
+.dsec{margin-bottom:28px}
+.dsec h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--copper);margin:0 0 10px;text-transform:uppercase;border-bottom:1px solid var(--edge);padding-bottom:8px}
+
 #totop{position:fixed;right:18px;bottom:18px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 #totop.show{opacity:1;pointer-events:auto}
 #printnote{display:none;font-family:var(--mono);font-size:11px;color:var(--gold);border:1px dashed var(--gold);border-radius:3px;padding:8px 12px;margin:0 0 18px;line-height:1.5}
@@ -114,7 +126,7 @@ body.ko .cols,body.en .cols{grid-template-columns:1fr}
   @page{size:A4 portrait;margin:13mm}
   body{background:#fff;color:#111;font-size:9.2pt}
   .wrap{max-width:none;padding:0}
-  .bar,.railwrap,.foot,svg.trace,#totop,#printnote,.rm .dtl{display:none!important}
+  .bar,.railwrap,.foot,svg.trace,#totop,#printnote,.rm .dtl,#detail,.more{display:none!important}
   .eyebrow{color:#666}
   h1{font-size:16pt;color:#111}
   .mapwrap{overflow:visible}
@@ -224,6 +236,8 @@ body.ko .cols,body.en .cols{grid-template-columns:1fr}
 
 <button id="totop" aria-label="맨 위로 back to top">▲ TOP</button>
 
+<div id="detail" role="dialog" aria-modal="true" aria-label="상세 정보 detail page"></div>
+
 <div class="foot">
   <span>← → 방향키로 이동 · ARROW KEYS TO NAVIGATE</span>
   <span>구리 트레이스 = 판넬 이동 경로 · 비아 = 층간 이송</span>
@@ -302,6 +316,48 @@ var STEPS=[
  mk:"",me:""}
 ];
 
+/* Detail pages, keyed by step number. A "상세 페이지 DETAIL PAGE" button
+   appears automatically on any step listed here; add a new entry to add
+   a page. Each section has a Korean/English heading and paired rows. */
+var DETAILS={
+"02":{
+ tko:"창고 · 재단 — 상세 정보", ten:"Material store & cutting — detailed information",
+ sections:[
+  {hko:"코어 / 원판(CCL) 종류", hen:"Types of core / raw laminate (CCL)", rows:[
+   {k:"FR-4 (유리섬유 에폭시) — 가장 널리 쓰이는 표준 원판, Tg 130–140°C",
+    e:"FR-4 (glass-fibre epoxy) — the standard laminate for most boards, Tg 130–140 °C"},
+   {k:"High-Tg FR-4 — Tg 170°C 이상, 다층기판·무연 리플로우 대응",
+    e:"High-Tg FR-4 — Tg 170 °C or higher, for multilayer boards and lead-free reflow"},
+   {k:"할로겐 프리 FR-4 — 환경 규제(RoHS 등) 대응용",
+    e:"Halogen-free FR-4 — for environmental compliance requirements"},
+   {k:"CEM-1 / CEM-3 — 종이·유리 복합 기재, 단면/양면 저가 보드용",
+    e:"CEM-1 / CEM-3 — paper/glass composite, for low-cost single- and double-sided boards"},
+   {k:"메탈 코어(알루미늄) — LED·전원 등 방열이 필요한 보드",
+    e:"Metal core (aluminium) — for LED and power boards that need heat dissipation"},
+   {k:"폴리이미드 — 연성(Flex)·고온용",
+    e:"Polyimide — for flex and high-temperature applications"},
+   {k:"PTFE·고주파 기재 (Rogers 등) — RF·안테나용, 낮은 유전율·손실",
+    e:"PTFE / high-frequency laminates (e.g. Rogers) — for RF and antenna boards, low Dk/Df"},
+  ]},
+  {hko:"동박 두께", hen:"Copper foil weight", rows:[
+   {k:"½ oz (18 µm) — 미세 회로용", e:"½ oz (18 µm) — for fine-line circuitry"},
+   {k:"1 oz (35 µm) — 표준", e:"1 oz (35 µm) — standard"},
+   {k:"2 oz (70 µm) 이상 — 대전류·전원용", e:"2 oz (70 µm) and up — for high-current and power boards"},
+  ]},
+  {hko:"코어 두께", hen:"Core thickness", rows:[
+   {k:"일반 범위 0.1–1.6 mm — 층 구성(stack-up)에 따라 선택",
+    e:"Typical range 0.1–1.6 mm, chosen to suit the stack-up"},
+   {k:"경화 완료된 코어와 반경화 프리프레그를 조합해 최종 두께를 맞춤",
+    e:"Cured cores are combined with semi-cured prepreg to reach the finished thickness"},
+  ]},
+  {hko:"보관 · 취급", hen:"Storage & handling", rows:[
+   {k:"방습 보관 — 흡습된 원판은 재단 후 베이킹으로 수분 제거",
+    e:"Store dry — laminate that has absorbed moisture is baked after cutting"},
+   {k:"선입선출(FIFO)로 재고 회전", e:"Stock rotates first-in, first-out"},
+  ]},
+ ]},
+};
+
 var FLOOR={office3:0,pack3:0,psr3:0,aoi2:1,exp2:1,wet2:1,dsm2:1,plt2:1,wh1:2,lay1:2,prs1:2,trm1:2,drl1:2,emma1:2,out:3};
 var idx=0, timer=null, map=document.getElementById('map'), svg=null;
 
@@ -319,6 +375,7 @@ function buildList(){
       +'<div class="cols"><ul class="ko">'+s.k.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'
       +'<ul class="en">'+s.e.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'
       +(s.mk?'<div class="mv"><span class="ko">'+esc(s.mk)+'</span><span class="en">'+esc(s.me)+'</span></div>':'')
+      +(DETAILS[s.n]?'<a class="more" href="#d/'+s.n+'">상세 페이지 DETAIL PAGE →</a>':'')
       +'</div></div>';
   }
   document.getElementById('steps').innerHTML=h;
@@ -328,10 +385,46 @@ function buildList(){
     els[j].addEventListener('click',function(){go(+this.dataset.i)});
     els[j].addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go(+this.dataset.i)}});
   }
+  var mores=document.querySelectorAll('.more');
+  for(var m2=0;m2<mores.length;m2++){
+    mores[m2].addEventListener('click',function(ev){ev.stopPropagation()});
+  }
 }
 
+function openDetail(n){
+  var D=DETAILS[n];
+  var h='<div class="dwrap"><a class="back" href="#">← 돌아가기 BACK</a>'
+   +'<p class="eyebrow">STEP '+esc(n)+' — DETAIL</p>'
+   +'<h1><span class="ko">'+esc(D.tko)+'</span> <span class="alt en">'+esc(D.ten)+'</span></h1>'
+   +'<div style="margin-top:22px">';
+  for(var i=0;i<D.sections.length;i++){
+    var sec=D.sections[i];
+    h+='<div class="dsec"><h3><span class="ko">'+esc(sec.hko)+'</span> <span class="en">'+esc(sec.hen)+'</span></h3>'
+     +'<div class="cols"><ul class="ko">'+sec.rows.map(function(r){return '<li>'+esc(r.k)+'</li>'}).join('')+'</ul>'
+     +'<ul class="en">'+sec.rows.map(function(r){return '<li>'+esc(r.e)+'</li>'}).join('')+'</ul></div></div>';
+  }
+  h+='</div><a class="back" href="#">← 돌아가기 BACK</a></div>';
+  var el=document.getElementById('detail');
+  el.innerHTML=h;
+  el.classList.add('show');
+  el.scrollTop=0;
+  document.body.classList.add('detail-open');
+}
+
+function closeDetail(){
+  document.getElementById('detail').classList.remove('show');
+  document.body.classList.remove('detail-open');
+}
+
+function checkHash(){
+  var m=location.hash.match(/^#d\/(.+)$/);
+  if(m&&DETAILS[m[1]]) openDetail(m[1]);
+  else closeDetail();
+}
+window.addEventListener('hashchange',checkHash);
+
 function fixHeadings(){
-  var mode=document.body.className;
+  var mode=document.body.classList.contains('en')?'en':(document.body.classList.contains('ko')?'ko':'both');
   var h5=document.querySelectorAll('.h5');
   for(var i=0;i<h5.length;i++) h5[i].style.display=(mode==='both')?'':'none';
   var enH=document.querySelectorAll('.h4.en');
@@ -543,13 +636,18 @@ for(var L=0;L<lb.length;L++){
   lb[L].addEventListener('click',function(){
     for(var z=0;z<lb.length;z++) lb[z].setAttribute('aria-pressed','false');
     this.setAttribute('aria-pressed','true');
-    document.body.className=this.dataset.lang;
+    document.body.classList.remove('ko','both','en');
+    document.body.classList.add(this.dataset.lang);
     fixHeadings();
     drawTrace();
   });
 }
 
 document.addEventListener('keydown',function(e){
+  if(document.body.classList.contains('detail-open')){
+    if(e.key==='Escape'){location.hash=''}
+    return;
+  }
   if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter')) return;
   if(e.key==='ArrowRight'){e.preventDefault();setPlay(false);go(idx+1)}
   if(e.key==='ArrowLeft'){e.preventDefault();setPlay(false);go(idx-1)}
@@ -561,6 +659,7 @@ window.addEventListener('beforeprint',function(){setPlay(false)});
 
 fixHeadings();
 go(0,false);
+checkHash();
 </script>
 </body>
 </html>

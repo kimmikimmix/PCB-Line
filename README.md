@@ -29,3 +29,9 @@ Everything lives in `index.html`:
   placed on a 12-column grid per floor. `data-room` is the id `STEPS` refers to.
 - **`FLOOR`** — maps each room id to its floor row (0 = top row), used to draw
   the transfer traces and via dots between floors.
+- **`DETAILS`** — optional detail pages, keyed by step number (e.g. `"02"`).
+  Any step with an entry automatically gets a "상세 페이지 DETAIL PAGE →"
+  button that opens a full-screen page (link `#d/02`, back button and Escape
+  to return). Each page is a list of sections with bilingual headings
+  (`hko`/`hen`) and paired Korean/English rows (`k`/`e`). To add a page for
+  another step, copy the `"02"` entry and change the content.
