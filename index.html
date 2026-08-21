@@ -58,6 +58,8 @@ svg.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;o
 .rm.off .rko{color:var(--fr4)}
 .rm.off .tag,.rm.off .ren{color:var(--fr4);opacity:.7}
 .rm.off.live{background:rgba(201,189,130,.09);box-shadow:0 0 0 1px var(--gold)}
+.rm .dtl{position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--board);background:var(--gold);border-radius:2px;padding:2px 6px;opacity:0;pointer-events:none;transition:opacity .15s;cursor:pointer}
+.rm:hover .dtl,.rm:focus-visible .dtl{opacity:1;pointer-events:auto}
 .gap{grid-column:span 4}
 .gap6{grid-column:span 6}
 
@@ -89,6 +91,11 @@ body.en .ko{display:none}
 body.ko .cols,body.en .cols{grid-template-columns:1fr}
 .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--edge);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--silk-dim);opacity:.65;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
+#totop{position:fixed;right:18px;bottom:18px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#totop.show{opacity:1;pointer-events:auto}
+#printnote{display:none;font-family:var(--mono);font-size:11px;color:var(--gold);border:1px dashed var(--gold);border-radius:3px;padding:8px 12px;margin:0 0 18px;line-height:1.5}
+#printnote.show{display:block}
+
 @media (max-width:700px){
   .wrap{padding:22px 14px 56px}
   h1{font-size:21px}
@@ -103,7 +110,7 @@ body.ko .cols,body.en .cols{grid-template-columns:1fr}
   @page{size:A4 portrait;margin:13mm}
   body{background:#fff;color:#111;font-size:9.2pt}
   .wrap{max-width:none;padding:0}
-  .bar,.rail,.foot,svg.trace{display:none!important}
+  .bar,.rail,.foot,svg.trace,#totop,#printnote,.rm .dtl{display:none!important}
   .eyebrow{color:#666}
   h1{font-size:16pt;color:#111}
   .mapwrap{overflow:visible}
@@ -150,6 +157,8 @@ body.ko .cols,body.en .cols{grid-template-columns:1fr}
   <button id="print">인쇄 PRINT</button>
 </div>
 
+<p id="printnote">이 미리보기 화면에서는 인쇄가 차단되어 있습니다 — index.html 파일을 브라우저에서 직접 열어 인쇄하세요. · Printing is blocked in this embedded preview — open index.html directly in a browser to print.</p>
+
 <div class="mapwrap">
   <div class="map" id="map">
     <div class="axis"><span>← 좌측 LEFT</span><span>건물 배치 BUILDING LAYOUT</span><span>RIGHT 우측 →</span></div>
@@ -188,6 +197,8 @@ body.ko .cols,body.en .cols{grid-template-columns:1fr}
 <div class="rail"><i id="railfill" style="width:0%"></i></div>
 
 <div class="steps" id="steps"></div>
+
+<button id="totop" aria-label="맨 위로 back to top">▲ TOP</button>
 
 <div class="foot">
   <span>← → 방향키로 이동 · ARROW KEYS TO NAVIGATE</span>
@@ -453,19 +464,55 @@ buildList();
 document.getElementById('prev').onclick=function(){setPlay(false);go(idx-1)};
 document.getElementById('next').onclick=function(){setPlay(false);go(idx+1)};
 document.getElementById('play').onclick=function(){setPlay(this.getAttribute('aria-pressed')!=='true')};
-document.getElementById('print').onclick=function(){window.print()};
+document.getElementById('print').onclick=function(){
+  var fired=false;
+  var h=function(){fired=true};
+  window.addEventListener('beforeprint',h);
+  window.print();
+  setTimeout(function(){
+    window.removeEventListener('beforeprint',h);
+    if(!fired){
+      var note=document.getElementById('printnote');
+      note.classList.add('show');
+      setTimeout(function(){note.classList.remove('show')},8000);
+    }
+  },400);
+};
+
+function nextStepForRoom(id){
+  for(var k=1;k<=STEPS.length;k++){
+    var c=(idx+k)%STEPS.length;
+    if(STEPS[c].room.indexOf(id)>-1) return c;
+  }
+  return -1;
+}
 
 var rms=document.querySelectorAll('.rm');
 for(var i=0;i<rms.length;i++){
   rms[i].addEventListener('click',function(){
     setPlay(false);
-    var id=this.dataset.room;
-    for(var k=1;k<=STEPS.length;k++){
-      var c=(idx+k)%STEPS.length;
-      if(STEPS[c].room.indexOf(id)>-1){go(c);return}
-    }
+    var c=nextStepForRoom(this.dataset.room);
+    if(c>-1) go(c,false);
   });
+  var dtl=document.createElement('span');
+  dtl.className='dtl';
+  dtl.textContent='상세 DETAILS ▼';
+  dtl.addEventListener('click',function(ev){
+    ev.stopPropagation();
+    setPlay(false);
+    var c=nextStepForRoom(this.parentNode.dataset.room);
+    if(c>-1) go(c,true);
+  });
+  rms[i].appendChild(dtl);
 }
+
+var totop=document.getElementById('totop');
+new IntersectionObserver(function(en){
+  totop.classList.toggle('show',!en[0].isIntersecting);
+},{threshold:0}).observe(document.querySelector('.mapwrap'));
+totop.onclick=function(){
+  window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+};
 
 var lb=document.querySelectorAll('[data-lang]');
 for(var L=0;L<lb.length;L++){
