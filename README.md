@@ -29,9 +29,17 @@ Everything lives in `index.html`:
   placed on a 12-column grid per floor. `data-room` is the id `STEPS` refers to.
 - **`FLOOR`** — maps each room id to its floor row (0 = top row), used to draw
   the transfer traces and via dots between floors.
-- **`DETAILS`** — optional detail pages, keyed by step number (e.g. `"02"`).
+- **`DETAILS`** — optional detail pages, keyed by step number (e.g. `"02"`)
+  or by name for standalone reference pages (e.g. `"mat"`, reached by link).
   Any step with an entry automatically gets a "상세 페이지 DETAIL PAGE →"
   button that opens a full-screen page (link `#d/02`, back button and Escape
   to return). Each page is a list of sections with bilingual headings
-  (`hko`/`hen`) and paired Korean/English rows (`k`/`e`). To add a page for
-  another step, copy the `"02"` entry and change the content.
+  (`hko`/`hen`); a section may carry paired Korean/English rows (`k`/`e`),
+  paragraphs (`pko`/`pen`), a table (`table: {head, rows, nw}` — `nw` lists
+  column indexes kept on one line) and a footnote (`nko`/`nen`). Table cells
+  are plain strings or `{k, e}` pairs that follow the language toggle. Pages
+  can also declare `eyebrow`, a lede (`lko`/`len`) and cross-`links`.
+- **`MAT`** — the CCL materials master chart (87 rows) shown on the
+  `#d/mat` reference guide, which is linked from the step 02 detail page.
+  Dk/Df values are typical published figures near 10 GHz; rows flagged in
+  the guide's section 7 still need internal confirmation.
