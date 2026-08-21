@@ -1,33 +1,31 @@
-# PCB Line — Interactive Facility Map
+# PCB Line — 제조 공정 흐름도 / Interactive Process Flow Map
 
-An interactive HTML map of a PCB manufacturing facility. The floor plan is at
-the top; clicking a room shows the process and steps that happen there, and the
-copper arrows show the route material takes through the line.
+An interactive, bilingual (한국어 / English) map of the PCB plant. The building
+layout — 3F, 2F, 1F, plus the outsourced surface-finish partner — sits at the
+top; the 17-step process sequence is listed below. Stepping through the
+sequence lights up the current room and draws the panel's transfer route as a
+copper trace, with via dots marking floor-to-floor moves.
 
 ## How to use
 
-Open `index.html` in any browser — no server or install needed. Everything
-(map, styling, data) lives in that single file.
+Open `index.html` in any browser — no server or install needed.
 
-## How to put in your own rooms, steps, and routes
+- **◀ 이전 / 다음 ▶** or the **← → arrow keys** step through the process
+- **자동 재생 AUTO** plays the whole route automatically
+- **Click any room** on the map to jump to its next step in the sequence
+- **Click any step** in the list to jump there
+- **한국어 / 둘 다 / EN** switches the language of the step list
+- **인쇄 PRINT** produces a clean A4 printout (both languages, no controls)
 
-Open `index.html` and find the block near the top of the `<script>` marked
-**EDIT YOUR DATA HERE**. There are three things to edit:
+## How to edit the content
 
-1. **`FACILITY`** — the page title and subtitle.
-2. **`ROOMS`** — one entry per room. Each has:
-   - `id` — a short unique name used to reference the room in the route
-   - `x`, `y`, `w`, `h` — position and size on the map (the map canvas is
-     1000 wide × 560 tall)
-   - `name` — the label shown on the map
-   - `summary` — one-sentence description shown in the panel
-   - `steps` — the list of process steps shown when the room is clicked
-3. **`ROUTE`** — the order material flows through the rooms, as a list of room
-   ids. The numbered badges and the arrows between rooms are drawn
-   automatically from this list, so changing the route is just reordering ids.
+Everything lives in `index.html`:
 
-A room that is *not* in `ROUTE` (e.g. a QC lab or warehouse) still shows on the
-map and is still clickable — it just has no stage number or arrows.
-
-The current contents are placeholder data for a typical PCB line — replace them
-with your real layout and process notes.
+- **`STEPS`** (top of the `<script>`) — the process sequence. Each step has a
+  number `n`, the room(s) it happens in, Korean/English titles (`ko`/`en`),
+  location labels (`lk`/`le`), bullet lists (`k`/`e`), and the transfer note to
+  the next step (`mk`/`me`).
+- **Room buttons** (in the `.map` markup) — one `<button class="rm">` per room,
+  placed on a 12-column grid per floor. `data-room` is the id `STEPS` refers to.
+- **`FLOOR`** — maps each room id to its floor row (0 = top row), used to draw
+  the transfer traces and via dots between floors.

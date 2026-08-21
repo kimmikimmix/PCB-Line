@@ -1,521 +1,480 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PCB Line Map</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCB 제조 공정 흐름도 · PCB manufacturing process flow</title>
 <style>
-  :root {
-    --bg: #F1F4F0;
-    --surface: #FBFCFA;
-    --ink: #1C2420;
-    --muted: #5B6862;
-    --line: #D3DCD4;
-    --accent: #B4642D;
-    --accent-soft: #F3E4D5;
-    --room-fill: #E4EBE3;
-    --room-stroke: #9DB2A2;
-    --room-hover: #EEF3EC;
-    --trace: #B4642D;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #101B14;
-      --surface: #17251C;
-      --ink: #E8EFE8;
-      --muted: #93A698;
-      --line: #2A4033;
-      --accent: #E0954F;
-      --accent-soft: #3A2C1C;
-      --room-fill: #1E3A29;
-      --room-stroke: #43704F;
-      --room-hover: #26492F;
-      --trace: #E0954F;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #101B14;
-    --surface: #17251C;
-    --ink: #E8EFE8;
-    --muted: #93A698;
-    --line: #2A4033;
-    --accent: #E0954F;
-    --accent-soft: #3A2C1C;
-    --room-fill: #1E3A29;
-    --room-stroke: #43704F;
-    --room-hover: #26492F;
-    --trace: #E0954F;
-  }
+:root{
+  --board:#0A2E22; --board-2:#0E3A2B; --board-3:#124633; --edge:#1C5B44;
+  --copper:#C87F4A; --copper-dim:#7A4E2E; --gold:#E0B44C;
+  --silk:#EAF0EA; --silk-dim:#8FAC9D; --fr4:#C9BD82;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Consolas","D2Coding",monospace;
+  --sans:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--board);color:var(--silk);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 24px 72px}
 
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-    line-height: 1.55;
-  }
-  .wrap {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 2rem 1.25rem 4rem;
-  }
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--copper);margin:0 0 10px}
+h1{font-size:27px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px;line-height:1.25}
+h1 .alt{color:var(--silk-dim);font-weight:400}
+.lede{color:var(--silk-dim);font-size:14px;margin:0 0 26px}
 
-  header { margin-bottom: 1.5rem; }
-  .eyebrow {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 0.35rem;
-  }
-  h1 {
-    font-family: "Chakra Petch", "IBM Plex Sans", sans-serif;
-    font-size: clamp(1.7rem, 4vw, 2.4rem);
-    font-weight: 700;
-    margin: 0;
-    text-wrap: balance;
-  }
-  .subtitle { color: var(--muted); margin: 0.4rem 0 0; }
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 24px;padding-bottom:20px;border-bottom:1px solid var(--edge)}
+button{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--silk);background:var(--board-2);border:1px solid var(--edge);border-radius:3px;padding:8px 13px;cursor:pointer;transition:border-color .15s,color .15s}
+button:hover{border-color:var(--copper);color:var(--copper)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:var(--board-3)}
+.seg{display:inline-flex;gap:0}
+.seg button{border-radius:0;margin-left:-1px}
+.seg button:first-child{border-radius:3px 0 0 3px;margin-left:0}
+.seg button:last-child{border-radius:0 3px 3px 0}
+.spacer{flex:1}
+.count{font-family:var(--mono);font-size:12px;color:var(--silk-dim);letter-spacing:.08em;white-space:nowrap}
+.count b{color:var(--gold);font-weight:600}
 
-  .map-card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 0.75rem;
-    overflow-x: auto;
-  }
-  .map-card svg {
-    display: block;
-    width: 100%;
-    min-width: 720px;
-    height: auto;
-  }
+.mapwrap{position:relative;overflow-x:auto;padding-bottom:4px}
+.map{position:relative;min-width:660px}
+svg.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:3}
+.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--silk-dim);opacity:.7;margin-bottom:8px}
+.floor{display:grid;grid-template-columns:36px repeat(12,1fr);gap:7px;margin-bottom:7px;position:relative;z-index:1}
+.flab{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--silk-dim);border-right:1px solid var(--edge)}
+.rm{position:relative;background:var(--board-2);border:1px solid var(--edge);border-radius:3px;padding:9px 8px 8px;text-align:left;cursor:pointer;font-family:var(--sans);color:inherit;transition:border-color .2s,background .2s,transform .2s;min-width:0;z-index:2}
+.rm:hover{border-color:var(--copper);transform:translateY(-1px)}
+.rm .tag{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--silk-dim);opacity:.75;display:block;margin-bottom:5px}
+.rm .rko{font-size:12.5px;font-weight:600;line-height:1.25;display:block}
+.rm .ren{font-size:11px;line-height:1.25;color:var(--silk-dim);display:block;margin-top:2px}
+.rm .sn{position:absolute;top:7px;right:8px;font-family:var(--mono);font-size:10px;color:var(--copper);letter-spacing:.04em}
+.rm.seen{border-color:var(--copper-dim)}
+.rm.seen .sn{color:var(--copper)}
+.rm.live{border-color:var(--gold);background:var(--board-3);box-shadow:0 0 0 1px var(--gold),0 0 18px -4px var(--gold)}
+.rm.live .rko{color:var(--gold)}
+.rm.live .sn{color:var(--gold)}
+.rm.off{background:transparent;border:1px dashed var(--fr4);opacity:.85}
+.rm.off .rko{color:var(--fr4)}
+.rm.off .tag,.rm.off .ren{color:var(--fr4);opacity:.7}
+.rm.off.live{background:rgba(201,189,130,.09);box-shadow:0 0 0 1px var(--gold)}
+.gap{grid-column:span 4}
+.gap6{grid-column:span 6}
 
-  /* SVG parts */
-  .building { fill: none; stroke: var(--line); stroke-width: 2; }
-  .room rect {
-    fill: var(--room-fill);
-    stroke: var(--room-stroke);
-    stroke-width: 1.5;
-    transition: fill 0.15s, stroke 0.15s;
-  }
-  .room { cursor: pointer; outline: none; }
-  .room:hover rect { fill: var(--room-hover); stroke: var(--accent); }
-  .room:focus-visible rect { stroke: var(--accent); stroke-width: 3; }
-  .room.active rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.5; }
-  .room-name {
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    fill: var(--ink);
-    text-anchor: middle;
-    pointer-events: none;
-  }
-  .room-badge {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12px;
-    fill: var(--muted);
-    pointer-events: none;
-  }
-  .room.active .room-badge { fill: var(--accent); }
-  .trace {
-    fill: none;
-    stroke: var(--trace);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .trace-arrow { fill: var(--trace); }
-  @media (prefers-reduced-motion: reduce) {
-    .room rect { transition: none; }
-  }
+.rail{height:2px;background:var(--edge);border-radius:2px;margin:20px 0 30px;position:relative;overflow:hidden}
+.rail i{position:absolute;left:0;top:0;bottom:0;background:var(--copper);transition:width .35s ease}
 
-  /* Detail panel */
-  .panel {
-    margin-top: 1.25rem;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 1.5rem 1.75rem;
-    min-height: 12rem;
-  }
-  .panel .placeholder { color: var(--muted); margin: 0; }
-  .panel-eyebrow {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 0.3rem;
-  }
-  .panel h2 {
-    font-family: "Chakra Petch", sans-serif;
-    font-size: 1.4rem;
-    margin: 0 0 0.5rem;
-  }
-  .panel .summary { margin: 0 0 1rem; max-width: 62ch; }
-  .steps { list-style: none; margin: 0; padding: 0; max-width: 62ch; }
-  .steps li {
-    display: flex;
-    gap: 0.8rem;
-    padding: 0.45rem 0;
-    border-top: 1px solid var(--line);
-  }
-  .steps li:first-child { border-top: none; }
-  .steps .n {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-    color: var(--accent);
-    padding-top: 0.15rem;
-    min-width: 1.6rem;
-    font-variant-numeric: tabular-nums;
-  }
-  .panel-nav {
-    display: flex;
-    gap: 0.6rem;
-    margin-top: 1.25rem;
-  }
-  .panel-nav button {
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ink);
-    background: none;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 0.45rem 0.9rem;
-    cursor: pointer;
-  }
-  .panel-nav button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-  .panel-nav button:disabled { opacity: 0.4; cursor: default; }
+.steps{display:flex;flex-direction:column;gap:2px}
+.st{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:14px 14px 14px 0;border-top:1px solid var(--edge);cursor:pointer;transition:background .18s}
+.st:hover{background:var(--board-2)}
+.st:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.st .badge{font-family:var(--mono);font-size:13px;color:var(--silk-dim);border:1px solid var(--edge);border-radius:3px;height:30px;display:flex;align-items:center;justify-content:center;letter-spacing:.02em;margin-left:8px}
+.st.seen .badge{color:var(--copper);border-color:var(--copper-dim)}
+.st.live{background:var(--board-2)}
+.st.live .badge{color:var(--board);background:var(--gold);border-color:var(--gold);font-weight:700}
+.st.live .h4{color:var(--gold)}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.h4{font-size:16px;font-weight:600;margin:0;line-height:1.3}
+.h5{font-size:13px;color:var(--silk-dim);margin:1px 0 0}
+.loc{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--silk-dim);opacity:.8;white-space:nowrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 30px;margin-top:9px}
+.cols ul{margin:0;padding-left:17px}
+.cols li{font-size:13.5px;line-height:1.55;margin-bottom:2px}
+.cols .en li{color:var(--silk-dim)}
+.mv{font-family:var(--mono);font-size:11px;color:var(--copper);letter-spacing:.03em;margin-top:9px;display:flex;align-items:center;gap:7px}
+.mv::before{content:"";width:16px;height:1px;background:var(--copper);flex:none}
+
+body.ko .en{display:none}
+body.en .ko{display:none}
+body.ko .cols,body.en .cols{grid-template-columns:1fr}
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--edge);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--silk-dim);opacity:.65;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+@media (max-width:700px){
+  .wrap{padding:22px 14px 56px}
+  h1{font-size:21px}
+  .cols{grid-template-columns:1fr}
+  .st{grid-template-columns:38px 1fr;gap:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+
+@media print{
+  @page{size:A4 portrait;margin:13mm}
+  body{background:#fff;color:#111;font-size:9.2pt}
+  .wrap{max-width:none;padding:0}
+  .bar,.rail,.foot,svg.trace{display:none!important}
+  .eyebrow{color:#666}
+  h1{font-size:16pt;color:#111}
+  .mapwrap{overflow:visible}
+  .map{min-width:0}
+  .flab{color:#444;border-right:1px solid #bbb}
+  .rm{background:#f4f4f0;border:.5pt solid #999;box-shadow:none!important;padding:5px 5px 4px}
+  .rm .rko{color:#111;font-size:8pt}
+  .rm .ren,.rm .tag{color:#666;font-size:6.5pt}
+  .rm .sn{color:#111;font-size:7pt}
+  .rm.live{background:#f4f4f0;border-color:#999}
+  .rm.live .rko,.rm.live .sn{color:#111}
+  .rm.off{border:.8pt dashed #888;background:#fff}
+  .rm.off .rko{color:#333}
+  .st{border-top:.5pt solid #ccc;background:none!important;page-break-inside:avoid;padding:7px 0}
+  .st .badge{color:#111;border:.5pt solid #999;background:#fff!important;height:24px;font-size:9pt}
+  .st.live .h4,.h4{color:#111}
+  .h5,.cols .en li,.loc{color:#555}
+  .cols{grid-template-columns:1fr 1fr!important}
+  .cols li{font-size:8pt;line-height:1.35}
+  .mv{color:#666}
+  .mv::before{background:#666}
+  body.ko .en,body.en .ko{display:revert}
+}
 </style>
 </head>
-<body>
+<body class="both">
 <div class="wrap">
-  <header>
-    <p class="eyebrow">Facility Flow</p>
-    <h1 id="title"></h1>
-    <p class="subtitle" id="subtitle"></p>
-  </header>
 
-  <div class="map-card">
-    <svg id="map" viewBox="0 0 1000 560" role="group" aria-label="Facility floor plan">
-      <defs>
-        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
-                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path class="trace-arrow" d="M 0 0 L 10 5 L 0 10 z"></path>
-        </marker>
-      </defs>
-      <rect class="building" x="18" y="26" width="964" height="508" rx="6"></rect>
-      <g id="traces"></g>
-      <g id="rooms"></g>
-    </svg>
+<p class="eyebrow">FLOOR LAYOUT &amp; PROCESS SEQUENCE</p>
+<h1>PCB 제조 공정 흐름도 <span class="alt">/ PCB manufacturing process flow</span></h1>
+<p class="lede">한 장의 판넬이 3개 층을 오가며 거치는 전 공정 · One panel's route through all three floors</p>
+
+<div class="bar">
+  <button id="prev" aria-label="이전 단계 previous step">◀ 이전</button>
+  <button id="next" aria-label="다음 단계 next step">다음 ▶</button>
+  <button id="play" aria-pressed="false">자동 재생 AUTO</button>
+  <span class="count"><b id="cur">1</b> / <span id="tot">17</span> &nbsp;<span id="curname"></span></span>
+  <span class="spacer"></span>
+  <span class="seg" role="group" aria-label="표시 언어 language">
+    <button data-lang="ko" aria-pressed="false">한국어</button>
+    <button data-lang="both" aria-pressed="true">둘 다</button>
+    <button data-lang="en" aria-pressed="false">EN</button>
+  </span>
+  <button id="print">인쇄 PRINT</button>
+</div>
+
+<div class="mapwrap">
+  <div class="map" id="map">
+    <div class="axis"><span>← 좌측 LEFT</span><span>건물 배치 BUILDING LAYOUT</span><span>RIGHT 우측 →</span></div>
+    <div class="floor">
+      <div class="flab">3F</div>
+      <button class="rm" data-room="office3" style="grid-column:span 2"><span class="tag">설계 DESIGN</span><span class="sn">01</span><span class="rko">오피스 CAD/CAM</span><span class="ren">Office</span></button>
+      <button class="rm" data-room="pack3" style="grid-column:span 2"><span class="tag">출하 SHIP</span><span class="sn">15</span><span class="rko">최종검사·포장</span><span class="ren">Final QC / packing</span></button>
+      <div class="gap"></div>
+      <button class="rm" data-room="psr3" style="grid-column:span 4"><span class="tag">이미징 IMAGE</span><span class="sn">13</span><span class="rko">PSR · S/R · 실크 날인방</span><span class="ren">Solder mask / legend</span></button>
+    </div>
+    <div class="floor">
+      <div class="flab">2F</div>
+      <button class="rm" data-room="aoi2" style="grid-column:span 2"><span class="tag">검사 QC</span><span class="sn">05·12</span><span class="rko">AOI·수리</span><span class="ren">AOI / repair</span></button>
+      <button class="rm" data-room="exp2" style="grid-column:span 3"><span class="tag">이미징 IMAGE</span><span class="sn">04</span><span class="rko">D/F 노광실</span><span class="ren">Lamination / UV</span></button>
+      <button class="rm" data-room="wet2" style="grid-column:span 3"><span class="tag">습식 WET</span><span class="sn">03·11</span><span class="rko">WET · DES실</span><span class="ren">Wet / develop-etch</span></button>
+      <button class="rm" data-room="dsm2" style="grid-column:span 2"><span class="tag">습식 WET</span><span class="sn">09</span><span class="rko">디스미어·디버</span><span class="ren">Desmear / deburr</span></button>
+      <button class="rm" data-room="plt2" style="grid-column:span 2"><span class="tag">습식 WET</span><span class="sn">10</span><span class="rko">도금실</span><span class="ren">Plating</span></button>
+    </div>
+    <div class="floor">
+      <div class="flab">1F</div>
+      <button class="rm" data-room="wh1" style="grid-column:span 2"><span class="tag">물류 LOGI</span><span class="sn">02</span><span class="rko">창고·재단</span><span class="ren">Store / cutting</span></button>
+      <button class="rm" data-room="lay1" style="grid-column:span 2"><span class="tag">기계 MECH</span><span class="sn">06</span><span class="rko">본딩·레이업</span><span class="ren">Bonding / lay-up</span></button>
+      <button class="rm" data-room="prs1" style="grid-column:span 2"><span class="tag">기계 MECH</span><span class="sn">07</span><span class="rko">프레스</span><span class="ren">Press</span></button>
+      <button class="rm" data-room="trm1" style="grid-column:span 2"><span class="tag">기계 MECH</span><span class="sn">07</span><span class="rko">면취</span><span class="ren">Trimming</span></button>
+      <button class="rm" data-room="drl1" style="grid-column:span 2"><span class="tag">기계 MECH</span><span class="sn">08·14B</span><span class="rko">드릴링·라우팅</span><span class="ren">Drill / rout / V-cut</span></button>
+      <button class="rm" data-room="emma1" style="grid-column:span 2"><span class="tag">검사 QC</span><span class="sn">14</span><span class="rko">EMMA 검사</span><span class="ren">EMMA test</span></button>
+    </div>
+    <div class="floor">
+      <div class="flab" style="border:0;font-size:10px">외주</div>
+      <div class="gap6"></div>
+      <button class="rm off" data-room="out" style="grid-column:span 6"><span class="tag">외주 OUTSOURCED</span><span class="sn">OUT</span><span class="rko">표면처리 — 협력사</span><span class="ren">Surface finish — external supplier, off site</span></button>
+    </div>
   </div>
+</div>
 
-  <section class="panel" id="panel" aria-live="polite">
-    <p class="placeholder">Click a room on the map to see its process and steps.</p>
-  </section>
+<div class="rail"><i id="railfill" style="width:0%"></i></div>
+
+<div class="steps" id="steps"></div>
+
+<div class="foot">
+  <span>← → 방향키로 이동 · ARROW KEYS TO NAVIGATE</span>
+  <span>구리 트레이스 = 판넬 이동 경로 · 비아 = 층간 이송</span>
+</div>
 </div>
 
 <script>
-/* ============================================================
-   EDIT YOUR DATA HERE
-   ------------------------------------------------------------
-   1. FACILITY  — page title and subtitle.
-   2. ROOMS     — one entry per room. Position (x, y) and size
-                  (w, h) place it on the map (the map canvas is
-                  1000 wide x 560 tall). name/summary/steps are
-                  what shows in the panel when clicked.
-   3. ROUTE     — the order material flows through the rooms,
-                  by room id. Arrows are drawn automatically
-                  between consecutive rooms.
-   ============================================================ */
-
-const FACILITY = {
-  title: "PCB Production Line",
-  subtitle: "Click any room to see the process that happens there.",
-};
-
-const ROOMS = [
-  { id: "prep", x: 30, y: 40, w: 200, h: 120,
-    name: "Material Prep",
-    summary: "Copper-clad laminate is received, inspected, and cut into working panels.",
-    steps: [
-      "Receive and inspect laminate sheets",
-      "Cut sheets to panel size",
-      "Round corners and clean edges",
-      "Bake panels to remove moisture",
-    ] },
-  { id: "inner-imaging", x: 270, y: 40, w: 200, h: 120,
-    name: "Inner Layer Imaging",
-    summary: "Inner-layer circuit patterns are transferred onto the panels with photoresist.",
-    steps: [
-      "Clean panel surface",
-      "Apply dry-film photoresist",
-      "Expose the circuit image",
-      "Develop away unexposed resist",
-    ] },
-  { id: "etch-aoi", x: 510, y: 40, w: 200, h: 120,
-    name: "Etch & AOI",
-    summary: "Unwanted copper is etched away and every layer is optically inspected.",
-    steps: [
-      "Etch exposed copper",
-      "Strip remaining resist",
-      "Automated optical inspection (AOI)",
-      "Flag defects for repair or scrap",
-    ] },
-  { id: "lamination", x: 750, y: 40, w: 200, h: 120,
-    name: "Lamination",
-    summary: "Inner layers, prepreg, and copper foil are pressed into a single board.",
-    steps: [
-      "Apply oxide bonding treatment",
-      "Lay up cores, prepreg, and foil",
-      "Press under heat and pressure",
-      "Cool and trim the panels",
-    ] },
-  { id: "drilling", x: 750, y: 220, w: 200, h: 120,
-    name: "Drilling",
-    summary: "Through-holes and vias are drilled and prepared for plating.",
-    steps: [
-      "X-ray align to inner layers",
-      "Drill through-holes and vias",
-      "Deburr and desmear holes",
-    ] },
-  { id: "plating", x: 510, y: 220, w: 200, h: 120,
-    name: "Plating",
-    summary: "Copper is deposited into the drilled holes to connect the layers.",
-    steps: [
-      "Electroless copper deposition",
-      "Panel electroplating",
-      "Verify plating thickness",
-    ] },
-  { id: "outer-imaging", x: 270, y: 220, w: 200, h: 120,
-    name: "Outer Layer Imaging",
-    summary: "Outer-layer patterns are imaged, plated, and etched.",
-    steps: [
-      "Apply photoresist",
-      "Expose and develop outer pattern",
-      "Pattern plate copper and tin",
-      "Strip resist, etch, strip tin",
-    ] },
-  { id: "solder-mask", x: 30, y: 220, w: 200, h: 120,
-    name: "Solder Mask",
-    summary: "The protective solder mask coating is applied and cured.",
-    steps: [
-      "Clean and prep the surface",
-      "Coat with solder mask",
-      "Expose and develop openings",
-      "Thermal cure",
-    ] },
-  { id: "silkscreen", x: 30, y: 400, w: 200, h: 120,
-    name: "Silkscreen",
-    summary: "Legend text and markings are printed onto the boards.",
-    steps: [
-      "Print legend ink",
-      "Cure the ink",
-      "Verify markings",
-    ] },
-  { id: "surface-finish", x: 270, y: 400, w: 200, h: 120,
-    name: "Surface Finish",
-    summary: "Exposed copper pads get a solderable protective finish.",
-    steps: [
-      "Apply finish (HASL, ENIG, or OSP)",
-      "Check thickness and solderability",
-    ] },
-  { id: "rout-etest", x: 510, y: 400, w: 200, h: 120,
-    name: "Routing & E-Test",
-    summary: "Boards are cut to final shape and electrically tested.",
-    steps: [
-      "Rout or V-score board profiles",
-      "Flying-probe or bed-of-nails test",
-      "Mark and remove failures",
-    ] },
-  { id: "inspect-pack", x: 750, y: 400, w: 200, h: 120,
-    name: "Inspection & Packing",
-    summary: "Finished boards are inspected, packed, and shipped.",
-    steps: [
-      "Final visual and dimensional inspection",
-      "Clean and vacuum pack",
-      "Label and ship",
-    ] },
+var STEPS=[
+{n:"01",room:["office3"],ko:"오피스 CAD/CAM",en:"Office, CAD/CAM",lk:"3F 좌측 끝",le:"3F far left",
+ k:["CAD/CAM 제작","재단 사이즈 및 정보를 1층 창고로 전달"],
+ e:["CAD/CAM data preparation","Cut size and job info passed down to the 1F store"],
+ mk:"이동 3F → 1F 창고",me:"transfer 3F → 1F store"},
+{n:"02",room:["wh1"],ko:"창고 · 재단",en:"Material store, cutting",lk:"1F 좌측 끝",le:"1F far left",
+ k:["3층에서 내려온 정보 수령","재단 사이즈에 맞게 원자재 재단","재단된 재료를 AMR 로봇이 2층으로 이송"],
+ e:["Receives the spec sent down from 3F","Raw laminate cut to the specified panel size","AMR robot carries the cut material up to 2F"],
+ mk:"이동 1F → 2F (AMR 로봇)",me:"transfer 1F → 2F by AMR robot"},
+{n:"03",room:["wet2"],ko:"WET · DES실 — INNER 수세",en:"Wet / DES room, inner-layer clean",lk:"2F 중앙 우측",le:"2F centre-right",
+ k:["AMR가 전달한 재단 자재를 INNER 수세 컨베이어에 투입","컨베이어를 따라 좌측으로 이동하며 수세 및 전처리"],
+ e:["Cut cores loaded into the inner-layer cleaning conveyor","Panels travel leftward through rinse and pre-treatment"],
+ mk:"이동 2F 내 — 좌측 벽 너머 노광실로",me:"transfer within 2F, over the left wall to exposure"},
+{n:"04",room:["exp2"],ko:"D/F 노광실",en:"Dry film, lamination and UV exposure",lk:"2F 중앙 좌측",le:"2F centre-left",
+ k:["D/F 부착 후 lamination","UV 노광 실행","노광 완료 판넬은 컨베이어 벨트로 우측 WET·DES실 복귀","DES 기계를 거쳐 수세 완료 후 AOI 검사로"],
+ e:["Dry film applied and laminated","UV exposure","Exposed panels return right by conveyor to the wet / DES room","Through the DES line, rinsed, then on to AOI"],
+ mk:"이동 2F 내 — AOI 검사실로",me:"transfer within 2F to the AOI room"},
+{n:"05",room:["aoi2"],ko:"AOI 검사 · 수리실",en:"AOI inspection and repair",lk:"2F 좌측 끝",le:"2F left end",
+ k:["AOI 컴퓨터 검사 — Gerber 파일과 비교","Defect 발견 시 수리 또는 폐기","POSA 기계로 기준홀 가공","OXIDE 처리 — 흑화 미사용, 갈화만 사용"],
+ e:["Automated optical inspection against the Gerber data","Defects are repaired or the panel is scrapped","POSA machine drills the tooling holes","Oxide treatment, brown oxide only, no black oxide"],
+ mk:"이동 2F → 1F 레이업",me:"transfer 2F → 1F lay-up"},
+{n:"06",room:["lay1"],ko:"본딩 · 레이업",en:"Bonding and lay-up",lk:"1F 중앙",le:"1F centre",
+ k:["OXIDE 완료 판넬과 PP(prepreg)를 테두리 4군데 압착","Copper이 exposed인지 hidden인지에 따라 순서 결정","Core + 양면 prepreg + 외층 copper 순으로 stack up"],
+ e:["Oxidised panel tacked to prepreg at four edge points","Stacking order depends on exposed vs hidden copper","Core, prepreg both sides, outer copper foil"],
+ mk:"이동 1F 내 — stack up 후 프레스로",me:"transfer within 1F, stacked book to the press"},
+{n:"07",room:["prs1","trm1"],ko:"프레스 · 면취",en:"Press and trimming",lk:"1F 중앙 뒷편 → 우측 방",le:"1F rear centre → next room",
+ k:["일정 온도·압력으로 약 3시간 press","약 30분 cool down","Lay-up 해체 작업","우측 방 trimming 장비에서 삐져나온 prepreg·copper 면취"],
+ e:["About three hours at set temperature and pressure","About thirty minutes cool-down","Lay-up book disassembled","Overflowing prepreg and copper trimmed in the room to the right"],
+ mk:"이동 1F 내 — 우측 드릴링실로",me:"transfer within 1F to the drilling room"},
+{n:"08",room:["drl1"],ko:"드릴링",en:"Drilling",lk:"1F 우측 방",le:"1F right-hand room",
+ k:["X-ray로 via hole 기준 위치 확인","Artwork 판넬과 기준홀을 맞추어 stacking","파일과 일치하는 위치에 드릴"],
+ e:["X-ray locates the via hole reference points","Stacked to the artwork panel via the tooling holes","Drilled to the positions in the data file"],
+ mk:"이동 1F → 2F",me:"transfer 1F → 2F"},
+{n:"09",room:["dsm2"],ko:"고압수세 · 디스미어 · 디버",en:"High-pressure rinse, desmear, deburr",lk:"2F",le:"2F",
+ k:["고압수세","표면 연마","Desmear 및 deburr 작업"],
+ e:["High-pressure rinse","Surface grinding","Desmear and deburr"],
+ mk:"이동 2F 내 — 도금실로",me:"transfer within 2F to plating"},
+{n:"10",room:["plt2"],ko:"도금실",en:"Plating",lk:"2F 우측",le:"2F right",
+ k:["화학도금 후 전기도금 처리","화학약품에 민감한 원판은 플라즈마 처리 이후 전기도금","전기도금은 수직 또는 수평 두 가지 방식"],
+ e:["Electroless plating followed by electroplating","Chemically sensitive substrates get plasma treatment first","Electroplating runs either vertical or horizontal"],
+ mk:"이동 2F 내 — WET·DES실로",me:"transfer within 2F to the wet / DES room"},
+{n:"11",room:["wet2"],ko:"WET · DES실 재방문",en:"Wet / DES room, second pass",lk:"2F 중앙 우측",le:"2F centre-right",
+ k:["필요시 다시 WET·DES실로 이동 후 세척","4번 항목 반복 — 외층 회로 형성"],
+ e:["Where required, back to the wet / DES room for cleaning","Step 4 repeats, this time forming the outer layers"],
+ mk:"이동 2F 내 — AOI 검사실로",me:"transfer within 2F to the AOI room"},
+{n:"12",room:["aoi2"],ko:"AOI 재검사",en:"AOI, second inspection",lk:"2F 좌측 끝",le:"2F left end",
+ k:["다시 AOI를 통하여 defect 감시"],
+ e:["Panels run through AOI again to catch defects"],
+ mk:"이동 2F → 3F",me:"transfer 2F → 3F"},
+{n:"13",room:["psr3"],ko:"PSR · S/R · 실크 날인방",en:"Solder mask and legend",lk:"3F 우측",le:"3F right",
+ k:["모든 면을 코팅","비아홀·SMT land 등 코팅이 불필요한 부위를 제외하고 curing","Development을 통해 나머지 wash off","Silkscreen / legend 생성 후 건조"],
+ e:["Full-surface solder mask coating","Cured except via holes, SMT lands and similar openings","Uncured areas washed off in development","Silkscreen legend printed, then dried"],
+ mk:"이동 3F → 외주 협력사 출하",me:"shipped out to the supplier"},
+{n:"OUT",room:["out"],ko:"표면처리 — 협력사",en:"Surface finish — external supplier",lk:"사외",le:"off site",
+ k:["표면처리는 사내 공정이 아님 — 협력사에서 실시","솔더마스크·실크 완료 후 협력사로 출하","처리 완료 후 재입고하여 EMMA 검사로 진행"],
+ e:["Surface finish is not an in-house process; a partner company performs it","Panels ship out once solder mask and legend are done","They return to the plant and go on to the EMMA test"],
+ mk:"이동 협력사 → 1F 입고",me:"transfer supplier → back in at 1F"},
+{n:"14",room:["emma1"],ko:"EMMA 검사",en:"EMMA electrical test",lk:"1F 우측 끝",le:"1F far right",
+ k:["EMMA 기계를 이용해 검사"],
+ e:["Electrical test on the EMMA machine"],
+ mk:"이동 1F 내 — 드릴링실로",me:"transfer within 1F to the drilling room"},
+{n:"14B",room:["drl1"],ko:"라우팅 · V-cut",en:"Routing and V-cut",lk:"1F 드릴링실",le:"1F drilling room",
+ k:["드릴링실에서 실시 — 8번과 같은 방 재방문","라우팅으로 판넬에서 개별 보드 외형 가공","V-cut으로 분리선 가공","이후 같은 층에서 최종 수세"],
+ e:["Done in the drilling room, the same room as step 8","Routing profiles the individual boards out of the panel","V-cut scoring for the break-apart lines","Final rinse afterwards on the same floor"],
+ mk:"이동 1F → 3F",me:"transfer 1F → 3F"},
+{n:"15",room:["pack3"],ko:"최종검사 · 포장",en:"Final inspection and packing",lk:"3F 좌측 끝",le:"3F far left",
+ k:["최종 검사","포장 작업"],
+ e:["Final inspection","Packing"],
+ mk:"",me:""}
 ];
 
-const ROUTE = [
-  "prep", "inner-imaging", "etch-aoi", "lamination",
-  "drilling", "plating", "outer-imaging", "solder-mask",
-  "silkscreen", "surface-finish", "rout-etest", "inspect-pack",
-];
+var FLOOR={office3:0,pack3:0,psr3:0,aoi2:1,exp2:1,wet2:1,dsm2:1,plt2:1,wh1:2,lay1:2,prs1:2,trm1:2,drl1:2,emma1:2,out:3};
+var idx=0, timer=null, map=document.getElementById('map'), svg=null;
 
-/* ============================================================
-   RENDERING — you shouldn't need to edit below this line.
-   ============================================================ */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 
-const SVG_NS = "http://www.w3.org/2000/svg";
-const roomById = Object.fromEntries(ROOMS.map(r => [r.id, r]));
-let activeId = null;
-
-document.getElementById("title").textContent = FACILITY.title;
-document.getElementById("subtitle").textContent = FACILITY.subtitle;
-document.title = FACILITY.title;
-
-function el(tag, attrs = {}) {
-  const node = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
-  return node;
-}
-
-function center(r) { return { x: r.x + r.w / 2, y: r.y + r.h / 2 }; }
-
-/* Draw an orthogonal connector from room a to room b, edge to edge. */
-function tracePath(a, b) {
-  const ca = center(a), cb = center(b);
-  const dx = cb.x - ca.x, dy = cb.y - ca.y;
-  if (Math.abs(dy) < 10) {
-    // same row: horizontal
-    const x1 = dx > 0 ? a.x + a.w : a.x;
-    const x2 = dx > 0 ? b.x : b.x + b.w;
-    return `M ${x1} ${ca.y} L ${x2} ${cb.y}`;
+function buildList(){
+  var h='';
+  for(var i=0;i<STEPS.length;i++){
+    var s=STEPS[i];
+    h+='<div class="st" tabindex="0" role="button" data-i="'+i+'" aria-label="'+esc(s.n+' '+s.ko)+'">'
+      +'<div class="badge">'+s.n+'</div><div>'
+      +'<div class="hd"><div><p class="h4 ko">'+esc(s.ko)+'</p><p class="h4 en" style="display:none">'+esc(s.en)+'</p>'
+      +'<p class="h5 ko">'+esc(s.en)+'</p></div>'
+      +'<span class="loc"><span class="ko">'+esc(s.lk)+'</span> <span class="en">'+esc(s.le)+'</span></span></div>'
+      +'<div class="cols"><ul class="ko">'+s.k.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'
+      +'<ul class="en">'+s.e.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'
+      +(s.mk?'<div class="mv"><span class="ko">'+esc(s.mk)+'</span><span class="en">'+esc(s.me)+'</span></div>':'')
+      +'</div></div>';
   }
-  if (Math.abs(dx) < 10) {
-    // same column: vertical
-    const y1 = dy > 0 ? a.y + a.h : a.y;
-    const y2 = dy > 0 ? b.y : b.y + b.h;
-    return `M ${ca.x} ${y1} L ${ca.x} ${y2}`;
-  }
-  // L-shape: leave a horizontally, arrive at b vertically
-  const x1 = dx > 0 ? a.x + a.w : a.x;
-  const y2 = dy > 0 ? b.y : b.y + b.h;
-  return `M ${x1} ${ca.y} L ${cb.x} ${ca.y} L ${cb.x} ${y2}`;
-}
-
-function drawTraces() {
-  const g = document.getElementById("traces");
-  for (let i = 0; i < ROUTE.length - 1; i++) {
-    const a = roomById[ROUTE[i]], b = roomById[ROUTE[i + 1]];
-    if (!a || !b) continue;
-    const path = el("path", { d: tracePath(a, b), class: "trace", "marker-end": "url(#arrow)" });
-    g.appendChild(path);
+  document.getElementById('steps').innerHTML=h;
+  document.getElementById('tot').textContent=STEPS.length;
+  var els=document.querySelectorAll('.st');
+  for(var j=0;j<els.length;j++){
+    els[j].addEventListener('click',function(){go(+this.dataset.i)});
+    els[j].addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go(+this.dataset.i)}});
   }
 }
 
-/* Greedy word-wrap for room labels inside the box width. */
-function wrapLabel(name, maxWidth) {
-  const maxChars = Math.max(8, Math.floor(maxWidth / 9));
-  const words = name.split(" ");
-  const lines = [];
-  let line = "";
-  for (const w of words) {
-    if (line && (line + " " + w).length > maxChars) { lines.push(line); line = w; }
-    else line = line ? line + " " + w : w;
-  }
-  if (line) lines.push(line);
-  return lines;
+function fixHeadings(){
+  var mode=document.body.className;
+  var h5=document.querySelectorAll('.h5');
+  for(var i=0;i<h5.length;i++) h5[i].style.display=(mode==='both')?'':'none';
+  var enH=document.querySelectorAll('.h4.en');
+  for(var k=0;k<enH.length;k++) enH[k].style.display=(mode==='en')?'':'none';
+  var koH=document.querySelectorAll('.h4.ko');
+  for(var m=0;m<koH.length;m++) koH[m].style.display=(mode==='en')?'none':'';
 }
 
-function drawRooms() {
-  const g = document.getElementById("rooms");
-  for (const room of ROOMS) {
-    const stage = ROUTE.indexOf(room.id);
-    const group = el("g", { class: "room", tabindex: "0", role: "button", "data-id": room.id });
-    group.setAttribute("aria-label", room.name);
-    group.appendChild(el("rect", { x: room.x, y: room.y, width: room.w, height: room.h, rx: 4 }));
+function anchor(id){
+  var el=map.querySelector('[data-room="'+id+'"]');
+  var mb=map.getBoundingClientRect(), b=el.getBoundingClientRect();
+  return {x:b.left-mb.left+b.width/2, top:b.top-mb.top, bot:b.top-mb.top+b.height, w:b.width};
+}
 
-    if (stage !== -1) {
-      const badge = el("text", { class: "room-badge", x: room.x + 12, y: room.y + 22 });
-      badge.textContent = String(stage + 1).padStart(2, "0");
-      group.appendChild(badge);
+function mitre(pts,r){
+  var d='M '+pts[0][0]+' '+pts[0][1];
+  for(var i=1;i<pts.length-1;i++){
+    var p=pts[i-1],v=pts[i],n=pts[i+1];
+    var d1=Math.hypot(v[0]-p[0],v[1]-p[1]), d2=Math.hypot(n[0]-v[0],n[1]-v[1]);
+    var r1=Math.min(r,d1/2), r2=Math.min(r,d2/2);
+    var a=[v[0]+(p[0]-v[0])/d1*r1, v[1]+(p[1]-v[1])/d1*r1];
+    var b=[v[0]+(n[0]-v[0])/d2*r2, v[1]+(n[1]-v[1])/d2*r2];
+    d+=' L '+a[0]+' '+a[1]+' L '+b[0]+' '+b[1];
+  }
+  var L=pts[pts.length-1];
+  return d+' L '+L[0]+' '+L[1];
+}
+
+function route(from,to){
+  var A=anchor(from), B=anchor(to), fa=FLOOR[from], fb=FLOOR[to];
+  var pts,chan;
+  if(fa===fb){
+    chan=A.bot+14;
+    pts=[[A.x,A.bot],[A.x,chan],[B.x,chan],[B.x,B.bot]];
+  }else if(fa<fb){
+    chan=(A.bot+B.top)/2;
+    pts=[[A.x,A.bot],[A.x,chan],[B.x,chan],[B.x,B.top]];
+  }else{
+    chan=(B.bot+A.top)/2;
+    pts=[[A.x,A.top],[A.x,chan],[B.x,chan],[B.x,B.bot]];
+  }
+  return {d:mitre(pts,9), via:fa!==fb?[[A.x,fa<fb?A.bot:A.top],[B.x,fa<fb?B.top:B.bot]]:null};
+}
+
+function ns(t){return document.createElementNS('http://www.w3.org/2000/svg',t)}
+
+function drawTrace(){
+  if(svg) svg.remove();
+  svg=ns('svg'); svg.setAttribute('class','trace'); svg.setAttribute('aria-hidden','true');
+  map.appendChild(svg);
+  var s=STEPS[idx];
+  if(s.room.length>1){
+    var lnk=route(s.room[0],s.room[1]);
+    var p0=ns('path'); p0.setAttribute('d',lnk.d); p0.setAttribute('fill','none');
+    p0.setAttribute('stroke','#7A4E2E'); p0.setAttribute('stroke-width','2'); p0.setAttribute('stroke-linejoin','round');
+    svg.appendChild(p0);
+  }
+  if(idx>=STEPS.length-1) return;
+  var exit=s.room[s.room.length-1], nxt=STEPS[idx+1].room[0];
+  var r=route(exit,nxt);
+  var p=ns('path'); p.setAttribute('d',r.d); p.setAttribute('fill','none');
+  p.setAttribute('stroke','#C87F4A'); p.setAttribute('stroke-width','2.5');
+  p.setAttribute('stroke-linecap','round'); p.setAttribute('stroke-linejoin','round');
+  svg.appendChild(p);
+  if(r.via){
+    for(var i=0;i<r.via.length;i++){
+      var o=ns('circle'); o.setAttribute('cx',r.via[i][0]); o.setAttribute('cy',r.via[i][1]);
+      o.setAttribute('r','5.5'); o.setAttribute('fill','#0A2E22');
+      o.setAttribute('stroke','#E0B44C'); o.setAttribute('stroke-width','2');
+      svg.appendChild(o);
+      var c=ns('circle'); c.setAttribute('cx',r.via[i][0]); c.setAttribute('cy',r.via[i][1]);
+      c.setAttribute('r','1.6'); c.setAttribute('fill','#E0B44C');
+      svg.appendChild(c);
     }
+  }
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var len=p.getTotalLength();
+  if(!reduce){
+    p.style.strokeDasharray=len; p.style.strokeDashoffset=len;
+    p.getBoundingClientRect();
+    p.style.transition='stroke-dashoffset .75s cubic-bezier(.4,0,.2,1)';
+    p.style.strokeDashoffset=0;
+  }
+  var tok=ns('rect'); tok.setAttribute('width','11'); tok.setAttribute('height','8');
+  tok.setAttribute('rx','1.5'); tok.setAttribute('fill','#E0B44C');
+  svg.appendChild(tok);
+  var t0=null, dur=reduce?0:750;
+  function frame(ts){
+    if(t0===null) t0=ts;
+    var q=dur?Math.min(1,(ts-t0)/dur):1;
+    var pt=p.getPointAtLength(len*q);
+    tok.setAttribute('x',pt.x-5.5); tok.setAttribute('y',pt.y-4);
+    if(q<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
 
-    const lines = wrapLabel(room.name, room.w - 24);
-    const c = center(room);
-    const startY = c.y - ((lines.length - 1) * 18) / 2 + 5;
-    lines.forEach((text, i) => {
-      const t = el("text", { class: "room-name", x: c.x, y: startY + i * 18 });
-      t.textContent = text;
-      group.appendChild(t);
-    });
+function render(){
+  var s=STEPS[idx];
+  var rooms=document.querySelectorAll('.rm');
+  for(var i=0;i<rooms.length;i++){rooms[i].classList.remove('live','seen')}
+  for(var j=0;j<idx;j++){
+    for(var m=0;m<STEPS[j].room.length;m++){
+      var el=map.querySelector('[data-room="'+STEPS[j].room[m]+'"]');
+      if(el) el.classList.add('seen');
+    }
+  }
+  for(var n=0;n<s.room.length;n++){
+    var e2=map.querySelector('[data-room="'+s.room[n]+'"]');
+    if(e2){e2.classList.remove('seen');e2.classList.add('live')}
+  }
+  var sts=document.querySelectorAll('.st');
+  for(var q=0;q<sts.length;q++){
+    sts[q].classList.toggle('live',q===idx);
+    sts[q].classList.toggle('seen',q<idx);
+  }
+  document.getElementById('cur').textContent=idx+1;
+  document.getElementById('curname').textContent=s.n+' · '+s.ko;
+  document.getElementById('railfill').style.width=((idx+1)/STEPS.length*100)+'%';
+  drawTrace();
+}
 
-    group.addEventListener("click", () => selectRoom(room.id));
-    group.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectRoom(room.id); }
-    });
-    g.appendChild(group);
+function go(i,scroll){
+  idx=(i+STEPS.length)%STEPS.length;
+  render();
+  if(scroll!==false){
+    var el=document.querySelectorAll('.st')[idx];
+    if(el) el.scrollIntoView({block:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   }
 }
 
-function selectRoom(id) {
-  activeId = id;
-  document.querySelectorAll(".room").forEach(r =>
-    r.classList.toggle("active", r.dataset.id === id));
-  renderPanel(roomById[id]);
+function setPlay(on){
+  var b=document.getElementById('play');
+  b.setAttribute('aria-pressed',on?'true':'false');
+  b.textContent=on?'정지 STOP':'자동 재생 AUTO';
+  if(timer){clearInterval(timer);timer=null}
+  if(on) timer=setInterval(function(){go(idx+1)},3200);
 }
 
-function renderPanel(room) {
-  const panel = document.getElementById("panel");
-  const stage = ROUTE.indexOf(room.id);
-  const eyebrow = stage !== -1
-    ? `Stage ${String(stage + 1).padStart(2, "0")} / ${String(ROUTE.length).padStart(2, "0")}`
-    : "Support Area";
+buildList();
+document.getElementById('prev').onclick=function(){setPlay(false);go(idx-1)};
+document.getElementById('next').onclick=function(){setPlay(false);go(idx+1)};
+document.getElementById('play').onclick=function(){setPlay(this.getAttribute('aria-pressed')!=='true')};
+document.getElementById('print').onclick=function(){window.print()};
 
-  panel.innerHTML = "";
-
-  const eb = document.createElement("p");
-  eb.className = "panel-eyebrow";
-  eb.textContent = eyebrow;
-  panel.appendChild(eb);
-
-  const h2 = document.createElement("h2");
-  h2.textContent = room.name;
-  panel.appendChild(h2);
-
-  if (room.summary) {
-    const p = document.createElement("p");
-    p.className = "summary";
-    p.textContent = room.summary;
-    panel.appendChild(p);
-  }
-
-  if (room.steps && room.steps.length) {
-    const ol = document.createElement("ol");
-    ol.className = "steps";
-    room.steps.forEach((step, i) => {
-      const li = document.createElement("li");
-      const n = document.createElement("span");
-      n.className = "n";
-      n.textContent = String(i + 1).padStart(2, "0");
-      const s = document.createElement("span");
-      s.textContent = step;
-      li.appendChild(n);
-      li.appendChild(s);
-      ol.appendChild(li);
-    });
-    panel.appendChild(ol);
-  }
-
-  if (stage !== -1) {
-    const nav = document.createElement("div");
-    nav.className = "panel-nav";
-    const prev = document.createElement("button");
-    prev.textContent = "← Previous step";
-    prev.disabled = stage === 0;
-    prev.addEventListener("click", () => selectRoom(ROUTE[stage - 1]));
-    const next = document.createElement("button");
-    next.textContent = "Next step →";
-    next.disabled = stage === ROUTE.length - 1;
-    next.addEventListener("click", () => selectRoom(ROUTE[stage + 1]));
-    nav.appendChild(prev);
-    nav.appendChild(next);
-    panel.appendChild(nav);
-  }
+var rms=document.querySelectorAll('.rm');
+for(var i=0;i<rms.length;i++){
+  rms[i].addEventListener('click',function(){
+    setPlay(false);
+    var id=this.dataset.room;
+    for(var k=1;k<=STEPS.length;k++){
+      var c=(idx+k)%STEPS.length;
+      if(STEPS[c].room.indexOf(id)>-1){go(c);return}
+    }
+  });
 }
 
-drawTraces();
-drawRooms();
+var lb=document.querySelectorAll('[data-lang]');
+for(var L=0;L<lb.length;L++){
+  lb[L].addEventListener('click',function(){
+    for(var z=0;z<lb.length;z++) lb[z].setAttribute('aria-pressed','false');
+    this.setAttribute('aria-pressed','true');
+    document.body.className=this.dataset.lang;
+    fixHeadings();
+    drawTrace();
+  });
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter')) return;
+  if(e.key==='ArrowRight'){e.preventDefault();setPlay(false);go(idx+1)}
+  if(e.key==='ArrowLeft'){e.preventDefault();setPlay(false);go(idx-1)}
+});
+
+var rt;
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(drawTrace,140)});
+window.addEventListener('beforeprint',function(){setPlay(false)});
+
+fixHeadings();
+go(0,false);
 </script>
 </body>
 </html>
