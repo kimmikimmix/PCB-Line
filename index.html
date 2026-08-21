@@ -95,7 +95,7 @@ body.en .ko{display:none}
 body.ko .cols,body.en .cols{grid-template-columns:1fr}
 .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--edge);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--silk-dim);opacity:.65;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
-.more{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gold);border:1px solid var(--edge);border-radius:3px;padding:5px 10px;margin-top:10px;text-decoration:none;transition:border-color .15s}
+.more{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gold);border:1px solid var(--edge);border-radius:3px;padding:5px 10px;margin:10px 8px 0 0;text-decoration:none;transition:border-color .15s}
 .more:hover{border-color:var(--gold)}
 
 .g{color:inherit;text-decoration:none;border-bottom:1px dotted var(--gold);cursor:help}
@@ -471,7 +471,58 @@ var GLOSSARY=[
  en:"A camera-based inspection that photographs the copper pattern and compares it against the Gerber design data."},
 {t:"AMR",ge:"Autonomous mobile robot",
  ko:"공장 안에서 자재를 스스로 실어 나르는 이송 로봇.",
- en:"A self-driving robot that carries material between rooms and floors."}
+ en:"A self-driving robot that carries material between rooms and floors."},
+{t:"노광",ge:"Exposure (UV)",m:["UV 노광","UV exposure","exposure"],
+ ko:"D/F(드라이필름) 위에 회로 원판(artwork)을 올리고 자외선을 쬐어 회로 패턴을 전사하는 공정. 빛을 받은 부분이 경화되어 현상 후에도 남고, 나머지는 씻겨 나간다.",
+ en:"Shining ultraviolet light through the artwork onto the dry film to transfer the circuit pattern. The exposed areas harden and survive development; the rest washes away."},
+{t:"lamination",ge:"Lamination (D/F)",m:["라미네이션"],
+ ko:"드라이필름(D/F)을 열과 압력으로 동박 표면에 밀착시키는 작업. 여기서 말하는 lamination은 노광 전 D/F 부착을 뜻하며, 층을 붙이는 프레스 공정과는 다르다.",
+ en:"Pressing dry film onto the copper surface with heat and rollers. In this room lamination means applying the dry film before exposure — not the press that bonds the layers together."},
+{t:"Gerber",ge:"Gerber data",m:["거버"],
+ ko:"각 층의 회로 패턴을 좌표로 기술한 표준 설계 파일. AOI는 실제 판넬을 이 파일과 대조해 합격 여부를 판정한다.",
+ en:"The standard design file describing each layer's copper pattern as coordinates. AOI judges a panel by comparing it against this data."},
+{t:"artwork",ge:"Artwork",m:["원판 필름"],
+ ko:"회로 패턴이 그려진 원판 필름 또는 유리 마스크. 노광 시 판넬 위에 정확히 겹쳐 놓고 빛을 통과시킨다.",
+ en:"The film or glass master carrying the circuit image, laid precisely over the panel so light passes through it during exposure."},
+{t:"기준홀",ge:"Tooling hole",m:["tooling hole","reference hole"],
+ ko:"모든 공정에서 판넬의 위치를 같은 기준으로 잡기 위해 뚫는 정합용 구멍. 층간 정합(registration)의 기준이 되며, POSA 등 전용 장비로 가공한다.",
+ en:"Reference holes drilled so every later machine grips the panel the same way. They are the datum for layer-to-layer registration and are cut on dedicated equipment such as the POSA."},
+{t:"WET",ge:"Wet process",m:["습식"],
+ ko:"약품과 물을 사용하는 공정의 통칭 — 탈지·마이크로에칭·현상·에칭·박리·수세가 모두 여기에 속한다.",
+ en:"The umbrella term for any chemical/water process: degreasing, micro-etching, developing, etching, stripping and rinsing."},
+{t:"DES",ge:"Develop–Etch–Strip",m:["DES 라인"],
+ ko:"현상(Develop) → 에칭(Etch) → 박리(Strip)를 한 줄로 이어 놓은 라인. 노광된 D/F를 현상해 패턴을 드러내고, 노출된 구리를 에칭하고, 남은 D/F를 벗겨 회로만 남긴다.",
+ en:"One conveyorised line running Develop, Etch and Strip in sequence: develop the exposed dry film, etch the bared copper away, then strip the remaining film to leave the circuit."},
+{t:"수세",ge:"Rinsing",m:["rinse","고압수세"],
+ ko:"공정 사이에 약품과 이물을 씻어내는 단계. 통상 탈지 → 마이크로에칭(산세) → 1차 수세 → 순수(DI) 수세 → 에어나이프 건조 순으로 진행하며, 앞 공정 약품이 다음 조로 넘어가지 않도록 다단(cascade)으로 흘린다. 드릴링 뒤에는 홀 안의 절삭 분말을 밀어내기 위해 고압수세를 먼저 건다.",
+ en:"Washing chemistry and debris off between steps. The usual order is degrease → micro-etch (acid) → first rinse → DI (deionised) rinse → air-knife dry, run as a cascade so carry-over never reaches the next tank. After drilling, a high-pressure rinse comes first to flush swarf out of the holes."},
+{t:"SMT land",ge:"SMT land / pad",m:["랜드","pad"],
+ ko:"표면실장 부품이 납땜되는 구리 패드. 솔더마스크로 덮으면 안 되는 대표적인 부위다.",
+ en:"The copper pad a surface-mount component solders to — one of the areas that must be left open in the solder mask."},
+{t:"Silkscreen",ge:"Silkscreen",m:["실크","실크스크린"],
+ ko:"보드 표면에 부품 번호·극성·로고 등을 인쇄하는 공정 또는 그 인쇄물. 잉크를 날인·경화시켜 만든다.",
+ en:"Printing the component designators, polarity marks and logos onto the board surface, and the printed layer itself."},
+{t:"legend",ge:"Legend",m:["레전드"],
+ ko:"실크스크린으로 인쇄된 문자·기호 자체를 가리키는 말. 실크스크린이 '공정'이라면 레전드는 그 '결과물'이다.",
+ en:"The printed characters and symbols themselves. If silkscreen is the process, the legend is what it leaves behind."},
+{t:"라우팅",ge:"Routing",m:["routing","rout"],
+ ko:"회전하는 라우터 비트로 판넬에서 보드 외형을 깎아 잘라내는 가공. 절단면이 완전히 분리되며 곡선·모따기 등 자유로운 형상이 가능하다. V-cut과 달리 재료가 실제로 제거된다.",
+ en:"Cutting the board outline out of the panel with a spinning router bit. It removes material and fully separates the profile, so any shape — curves, cut-outs, chamfers — is possible."},
+{t:"V-cut",ge:"V-cut (scoring)",m:["V컷","scoring"],
+ ko:"판넬 앞뒤에서 V자 칼날로 얕은 홈만 내어 두께의 약 1/3씩을 남기는 가공. 보드는 붙어 있다가 실장 후 손으로 꺾어 분리한다. 라우팅과의 차이: 라우팅은 재료를 깎아 완전히 분리하며 형상이 자유롭지만 폭만큼 손실이 생기고, V-cut은 직선만 가능하지만 손실이 거의 없고 여러 보드를 한 판으로 실장할 수 있다.",
+ en:"Scoring a shallow V groove from both faces, leaving roughly a third of the thickness intact so the boards stay in one sheet and snap apart after assembly. Versus routing: routing removes material, fully separates the profile and allows any shape but wastes the kerf width; V-cut works on straight lines only, wastes almost nothing and keeps the array together for assembly."},
+{t:"OXIDE",ge:"Oxide treatment",p:"oxide",m:["산화처리","흑화","갈화"],
+ ko:"내층 구리 표면을 화학적으로 산화시켜 미세하게 거칠게 만드는 처리. 프리프레그 수지가 물리적으로 맞물릴 자리를 만들어 층간 박리를 막는다. 본 공장은 흑화(black oxide)를 쓰지 않고 갈화(brown oxide)만 사용한다.",
+ en:"Chemically growing a microscopically rough oxide on the inner-layer copper so the prepreg resin has something to key into, which is what stops the layers delaminating. This plant uses brown oxide only, never black."},
+{t:"레이업",ge:"Lay-up",p:"layup",m:["lay-up","layup","stack up","stack-up"],
+ ko:"코어·프리프레그·외층 동박을 설계된 순서대로 쌓아 프레스에 넣을 '책(book)'을 만드는 작업. 쌓는 순서와 정합이 완성 기판의 두께·임피던스·휨을 결정한다.",
+ en:"Stacking cores, prepreg and outer copper foil in the designed order to build the 'book' that goes into the press. The order and the registration decide the finished thickness, impedance and flatness."},
+{t:"전기도금",ge:"Electroplating",p:"plating",m:["electroplating","electrolytic"],
+ ko:"전류를 걸어 홀 내벽과 표면에 구리를 두껍게 입히는 공정. 얇게 도전층만 입히는 무전해(화학)도금 뒤에 이어지며, 설비는 판넬을 세워 담그는 수직식과 눕혀 흘리는 수평식 두 방식이 있다.",
+ en:"Building copper thickness on the hole walls and surface by passing current through the bath. It follows the thin electroless (chemical) seed layer, and the equipment comes in two forms: vertical, where panels hang in the tank, and horizontal, where they travel flat."},
+{t:"defect",ge:"Defect",p:"defects",m:["결함","디펙트"],
+ ko:"설계 데이터와 다른 모든 이상 — 쇼트·오픈·니크·잔동 등. AOI가 검출하며, 구리를 깎아내면 되는 결함은 수리하고 구리를 채워야 하는 결함은 대부분 폐기한다.",
+ en:"Any departure from the design data — shorts, opens, nicks, copper residue and so on. AOI finds them; the ones fixed by removing copper are repaired, the ones needing copper added are usually scrapped."}
 ];
 
 /* Detail pages, keyed by step number (or a name, for reference pages
@@ -628,6 +679,203 @@ var DETAILS={
   ]},
  ]},
 
+"oxide":{
+ btn:"산화(갈화) 처리 · OXIDE PROCESS →",
+ eyebrow:"STEP 05 — OXIDE PROCESS",
+ tko:"산화처리 — 흑화와 갈화", ten:"Oxide treatment — black and brown oxide",
+ lko:"내층 회로가 완성된 뒤, 프레스로 넘어가기 직전에 거치는 표면 처리. 이 한 단계가 다층 기판의 층간 접착력을 사실상 결정한다.",
+ len:"The surface treatment an inner layer gets after its circuit is finished and before it goes to the press. This single step effectively decides whether a multilayer board holds together.",
+ sections:[
+  {hko:"1. 왜 하는가", hen:"1. Why it is done",
+   pko:["에칭이 끝난 내층 구리는 거울처럼 매끄럽습니다. 그 위에 프리프레그를 얹고 눌러도 수지가 매달릴 곳이 없어, 열충격을 몇 번 받으면 층이 떨어집니다(delamination).",
+    "산화처리는 구리 표면에 산화구리 결정을 미세하게 키워 표면적을 몇 배로 늘립니다. 프레스에서 녹은 수지가 이 결정 사이로 흘러 들어가 굳으면 기계적으로 맞물린 상태가 되고, 이것이 층간 접착력의 실체입니다.",
+    "부수적으로 표면이 검거나 갈색으로 균일하게 변하기 때문에, 색만 봐도 처리가 고르게 됐는지 1차 판단이 가능합니다."],
+   pen:["Inner-layer copper coming out of etch is mirror-smooth. Lay prepreg on it and press, and the resin has nothing to hold on to — a few thermal shocks later the layers separate.",
+    "Oxide treatment grows fine copper-oxide crystals on that surface, multiplying its area. In the press the molten resin flows between those crystals and freezes there, mechanically keying the layers together. That interlock is what bond strength actually is.",
+    "It also turns the surface a uniform black or brown, so the colour itself is a first-pass check that the treatment was even."]},
+  {hko:"2. 공정 순서", hen:"2. Process sequence",
+   table:{head:[{k:"순서",e:"Step"},{k:"내용",e:"What happens"},{k:"목적",e:"Purpose"}],nw:[0],rows:[
+    ["1",{k:"탈지 (Cleaner)",e:"Alkaline clean"},{k:"지문·기름·D/F 잔사 제거",e:"Removes fingerprints, oils and dry-film residue"}],
+    ["2",{k:"수세",e:"Rinse"},{k:"세정 약품 제거",e:"Washes the cleaner off"}],
+    ["3",{k:"마이크로에칭",e:"Micro-etch"},{k:"구리 1–2 µm를 균일하게 깎아 신생면을 노출",e:"Removes 1–2 µm of copper to expose fresh, uniform metal"}],
+    ["4",{k:"산세 (Predip)",e:"Acid predip"},{k:"산화조 농도·pH를 흐트러뜨리지 않도록 표면 조건을 맞춤",e:"Conditions the surface so it does not upset the oxide bath"}],
+    ["5",{k:"산화 (Oxide / Bond)",e:"Oxide bath"},{k:"산화구리 결정 성장 — 온도·시간·농도가 결정 크기를 좌우",e:"Grows the oxide crystals; temperature, time and concentration set the crystal size"}],
+    ["6",{k:"수세 · 순수 수세",e:"Rinse and DI rinse"},{k:"잔류 약품 완전 제거 — 남으면 프레스 후 기포·박리 원인",e:"All residual chemistry off; anything left causes voids or blisters after pressing"}],
+    ["7",{k:"건조",e:"Dry"},{k:"수분 완전 제거 후 즉시 레이업으로 — 방치하면 재오염·산화 열화",e:"Fully dried and taken straight to lay-up; standing around re-contaminates it"}],
+   ]},
+   nko:"산화 처리된 판넬은 지문 하나에도 접착력이 떨어집니다. 이 시점부터 프레스까지는 반드시 장갑을 착용하고 가장자리만 잡습니다.",
+   nen:"An oxidised panel loses bond strength from a single fingerprint. From here to the press, gloves on and edges only."},
+  {hko:"3. 흑화 vs 갈화", hen:"3. Black oxide versus brown oxide",
+   table:{head:[{k:"항목",e:"Aspect"},{k:"흑화 (Black oxide)",e:"Black oxide"},{k:"갈화 (Brown oxide)",e:"Brown oxide"}],nw:[0],rows:[
+    [{k:"결정 형태",e:"Crystal form"},{k:"길고 뾰족한 침상 결정",e:"Long, needle-like crystals"},{k:"짧고 조밀한 결정",e:"Short, dense crystals"}],
+    [{k:"색",e:"Colour"},{k:"짙은 흑색",e:"Deep black"},{k:"적갈색",e:"Red-brown"}],
+    [{k:"접착력",e:"Bond strength"},{k:"높지만 결정이 부러지기 쉬움",e:"High, but the fragile crystals break"},{k:"충분히 높고 안정적",e:"High enough and far more stable"}],
+    [{k:"핑크링",e:"Pink ring"},{k:"취약 — 산에 쉽게 녹아 홀 주변이 분홍색으로 드러남",e:"Prone to it: acid dissolves the oxide around holes, exposing pink copper"},{k:"저항성 높음",e:"Much more resistant"}],
+    [{k:"약품 관리",e:"Bath control"},{k:"까다로움",e:"Demanding"},{k:"상대적으로 관대함",e:"More forgiving"}],
+    [{k:"본 공장",e:"This plant"},{k:"미사용",e:"Not used"},{k:"전량 갈화 사용",e:"Used exclusively"}],
+   ]},
+   nko:"핑크링(pink ring)은 드릴 후 도금 전처리 산이 홀 주변으로 스며들어 산화층을 녹여버린 흔적입니다. 접착이 끊긴 자리라는 뜻이므로 미관 문제가 아니라 신뢰성 결함으로 다룹니다.",
+   nen:"A pink ring is where acid from post-drill processing crept along the interface and dissolved the oxide. It marks a debonded area, so it is treated as a reliability defect, not a cosmetic one."},
+  {hko:"4. 관리 항목과 대표 불량", hen:"4. What is controlled, and what goes wrong", rows:[
+   {k:"색 얼룩 — 탈지 부족 또는 약품 순환 불량. 얼룩진 부위는 접착력이 낮다",
+    e:"Patchy colour — poor cleaning or poor bath circulation; the patches are weak bond areas"},
+   {k:"결정 과성장 — 처리 시간·온도 초과. 결정이 부러지며 오히려 접착력이 떨어진다",
+    e:"Over-grown crystals — too long or too hot; the crystals snap and bond strength falls"},
+   {k:"핑크링 — 홀 주변 산화층 용해. 드릴 후 공정의 산 접촉 시간 관리 필요",
+    e:"Pink ring — oxide dissolved near the holes; control acid contact time in post-drill steps"},
+   {k:"재작업(stripping) — 불량 시 산화층을 벗기고 재처리 가능하나, 그때마다 구리가 얇아지므로 횟수를 제한한다",
+    e:"Rework — the oxide can be stripped and regrown, but each cycle thins the copper, so the number of passes is capped"},
+   {k:"경과 시간(queue time) — 산화 후 프레스까지의 허용 대기 시간을 정해 두고 초과 시 재처리",
+    e:"Queue time — a maximum wait between oxide and press is set; panels over it go back for reprocessing"},
+  ]},
+ ]},
+
+"layup":{
+ btn:"본딩 · 레이업 상세 · LAY-UP PROCESS →",
+ eyebrow:"STEP 06 — LAY-UP PROCESS",
+ tko:"본딩 · 레이업", ten:"Bonding and lay-up",
+ lko:"내층 판넬과 프리프레그, 외층 동박을 설계된 순서로 쌓아 프레스에 넣을 '책'을 만드는 공정. 여기서 정해진 순서와 정합이 완성 기판의 두께·임피던스·휨을 그대로 결정한다.",
+ len:"Stacking inner layers, prepreg and outer copper foil into the 'book' that goes into the press. The order and registration fixed here carry straight through to the finished board's thickness, impedance and flatness.",
+ sections:[
+  {hko:"1. 스택업을 구성하는 것들", hen:"1. What goes into the stack",
+   table:{head:[{k:"구성품",e:"Item"},{k:"역할",e:"Role"},{k:"주의점",e:"What to watch"}],nw:[0],rows:[
+    [{k:"코어 (Core)",e:"Core"},{k:"이미 경화된 내층 — 회로와 산화처리가 끝난 상태",e:"The already-cured inner layer, circuit etched and oxidised"},{k:"산화면을 손대지 않는다",e:"Never touch the oxidised faces"}],
+    [{k:"프리프레그 (PP)",e:"Prepreg"},{k:"반경화 수지 — 녹아서 접착제이자 절연층이 된다",e:"Half-cured resin: it melts to become both glue and dielectric"},{k:"수지 함량과 유리직물 번수로 두께를 맞춘다",e:"Resin content and glass style set the finished thickness"}],
+    [{k:"외층 동박",e:"Outer copper foil"},{k:"바깥 회로가 될 구리",e:"The copper that becomes the outer circuitry"},{k:"거친 면(매트면)이 수지 쪽을 향해야 한다",e:"The matte side must face the resin"}],
+    [{k:"이형지 · 분리판",e:"Release film / separator plate"},{k:"책끼리 붙지 않게 분리",e:"Keeps neighbouring books from bonding to each other"},{k:"찍힘·이물이 그대로 표면에 전사된다",e:"Any dent or speck prints straight onto the panel"}],
+    [{k:"쿠션지 (Kraft)",e:"Kraft cushion"},{k:"압력과 열을 고르게 전달",e:"Spreads heat and pressure evenly"},{k:"반복 사용 시 탄성이 죽으므로 교체 주기 관리",e:"Loses springiness with reuse; replace on schedule"}],
+    [{k:"정합 핀 · 리벳",e:"Tooling pins / rivets"},{k:"층이 어긋나지 않게 고정",e:"Holds the layers from shifting"},{k:"고정이 약하면 미스레지스트레이션",e:"Weak fixing means misregistration"}],
+   ]}},
+  {hko:"2. 작업 순서", hen:"2. Sequence of work",
+   table:{head:[{k:"순서",e:"Step"},{k:"내용",e:"What happens"}],nw:[0],rows:[
+    ["1",{k:"본딩(가접) — 산화 완료 코어와 프리프레그를 테두리 4군데만 열압착해 서로 고정",e:"Bonding: the oxidised core and prepreg are tacked together with heat at four points around the edge"}],
+    ["2",{k:"스택업 — 코어 + 양면 프리프레그 + 외층 동박 순으로 설계서대로 적층",e:"Stack-up: core, prepreg both sides, outer copper — in the order the stack-up drawing specifies"}],
+    ["3",{k:"북 구성 — 분리판·쿠션지와 함께 여러 세트를 한 권으로 묶음",e:"Book assembly: several sets are built into one book with separator plates and cushions"}],
+    ["4",{k:"프레스 — 정해진 온도·압력으로 약 3시간 (07번 공정)",e:"Press: about three hours at the set temperature and pressure (step 07)"}],
+    ["5",{k:"쿨다운 — 약 30분. 급랭하면 휨이 생기므로 승온·냉각 곡선을 따른다",e:"Cool-down: about thirty minutes; cooling too fast warps the panel, so the profile is followed"}],
+    ["6",{k:"해체(Lay-up 해체) — 책을 풀어 판넬만 회수하고 분리판·쿠션지는 분류",e:"Disassembly: the book is opened, panels recovered, plates and cushions sorted"}],
+    ["7",{k:"면취 — 테두리로 삐져나온 수지와 동박을 trimming 장비로 제거",e:"Trimming: resin and copper squeezed out at the edges are cut away"}],
+   ]}},
+  {hko:"3. 적층 순서를 정하는 원칙", hen:"3. The rules that set the stacking order", rows:[
+   {k:"Copper이 노출(exposed)인지 가려짐(hidden)인지에 따라 코어의 앞뒤 방향이 결정된다",
+    e:"Whether the copper is exposed or hidden decides which way round each core goes"},
+   {k:"대칭성 — 중심면을 기준으로 두께와 동박량이 대칭이어야 휨(warp·twist)이 없다",
+    e:"Symmetry — thickness and copper must mirror about the centre line, or the panel warps and twists"},
+   {k:"수지량 — 동박이 두껍거나 패턴이 성길수록 채울 수지가 많이 필요하므로 프리프레그 매수를 늘린다",
+    e:"Resin volume — thicker copper or sparse patterns need more resin to fill, so more prepreg plies"},
+   {k:"유리직물 선택 — 같은 두께라도 직물 번수에 따라 유전율과 평활도가 달라진다",
+    e:"Glass style — at the same thickness, the weave changes both dielectric constant and flatness"},
+   {k:"임피던스 — 유전체 두께가 곧 임피던스이므로 설계 스택업을 임의로 대체하지 않는다",
+    e:"Impedance — dielectric thickness *is* the impedance, so never substitute a stack-up on the floor"},
+  ]},
+  {hko:"4. 대표 불량", hen:"4. Typical failures", rows:[
+   {k:"미스레지스트레이션 — 가접 불량이나 핀 유격으로 층이 어긋남. 내층은 수리 불가",
+    e:"Misregistration — weak tacking or loose pins let layers shift; inner layers cannot be repaired"},
+   {k:"보이드(기포) — 수지량 부족, 진공 불량, 산화면 오염",
+    e:"Voids — too little resin, poor vacuum, or a contaminated oxide surface"},
+   {k:"수지 부족(resin starvation) — 두꺼운 동박 패턴을 채우지 못해 생기는 공극",
+    e:"Resin starvation — not enough resin to fill around heavy copper, leaving gaps"},
+   {k:"휨·비틀림 — 비대칭 스택업 또는 급격한 냉각",
+    e:"Warp and twist — an asymmetric stack-up, or cooling too quickly"},
+   {k:"표면 찍힘 — 분리판 이물이나 쿠션지 손상이 그대로 전사",
+    e:"Surface dents — debris on a separator plate or a damaged cushion prints into the panel"},
+  ]},
+ ]},
+
+"plating":{
+ btn:"수직 vs 수평 도금 · PLATING ORIENTATION →",
+ eyebrow:"STEP 10 — PLATING ORIENTATION",
+ tko:"전기도금 — 수직식과 수평식", ten:"Electroplating — vertical versus horizontal",
+ lko:"도금실의 전기도금은 판넬을 세워서 담그는 수직식과, 눕혀서 흘려보내는 수평식 두 가지로 나뉜다. 같은 구리를 입히지만 두께 분포와 대응 가능한 제품이 다르다.",
+ len:"Electroplating comes in two machine formats: vertical, where panels hang in a tank, and horizontal, where they travel flat through the line. Both deposit the same copper, but they differ in how evenly and on what kind of product.",
+ sections:[
+  {hko:"1. 그 전에 — 도금은 두 단계다", hen:"1. First: plating is two stages",
+   pko:["드릴로 뚫은 홀의 내벽은 유리와 수지, 즉 부도체입니다. 전류가 흐르지 않으므로 곧바로 전기도금을 할 수 없습니다.",
+    "그래서 먼저 무전해(화학)도금으로 홀 내벽 전체에 얇은 도전층을 화학 반응만으로 입힙니다. 이 층이 생겨야 판넬 전체가 하나의 전극이 됩니다.",
+    "그 다음 전류를 걸어 필요한 두께까지 구리를 키우는 것이 전기도금입니다. 화학약품에 민감한 원판은 무전해 대신 플라즈마로 홀 내벽을 처리한 뒤 전기도금으로 넘어갑니다.",
+    "아래 수직·수평 구분은 이 두 번째 단계, 즉 전기도금 설비의 형태에 관한 이야기입니다."],
+   pen:["The wall of a freshly drilled hole is glass and resin — an insulator. No current flows through it, so it cannot be electroplated directly.",
+    "Electroless (chemical) plating goes first, depositing a thin conductive film over the entire hole wall by chemical reaction alone. Only once that exists does the panel behave as a single electrode.",
+    "Electroplating then passes current to build the copper up to its required thickness. Substrates that react badly to the electroless chemistry get a plasma treatment of the hole walls instead, then go on to electroplating.",
+    "The vertical/horizontal distinction below is about that second stage — the format of the electroplating equipment."]},
+  {hko:"2. 수직식 vs 수평식", hen:"2. Vertical versus horizontal",
+   table:{head:[{k:"항목",e:"Aspect"},{k:"수직식 (VCP)",e:"Vertical (VCP)"},{k:"수평식",e:"Horizontal"}],nw:[0],rows:[
+    [{k:"판넬 자세",e:"Panel attitude"},{k:"클램프에 매달아 수직으로 조에 담금",e:"Clamped and hung vertically in the tank"},{k:"눕힌 채 롤러로 통과",e:"Carried flat through the line on rollers"}],
+    [{k:"용액 흐름",e:"Solution flow"},{k:"공기 교반·이덕터로 순환, 판넬도 흔들어 줌",e:"Air or eductor agitation, with the rack oscillating"},{k:"노즐로 판넬 면에 직접 분사",e:"Nozzles spray directly onto the panel face"}],
+    [{k:"두께 분포",e:"Thickness distribution"},{k:"상하 편차가 생기기 쉬움(용액 농도·기포 상승)",e:"Top-to-bottom variation is common (bath gradient, rising bubbles)"},{k:"전면에 균일하게 유리",e:"Naturally more uniform across the face"}],
+    [{k:"고종횡비 홀",e:"High aspect-ratio holes"},{k:"체류 시간을 길게 가져갈 수 있어 두꺼운 판에 유리",e:"Long dwell times suit thick boards"},{k:"홀 내부 용액 교환은 분사에 의존",e:"Relies on the spray to exchange solution inside the hole"}],
+    [{k:"박판 대응",e:"Thin panels"},{k:"자중으로 늘어지거나 클램프 자국이 남을 수 있음",e:"Can sag under their own weight or mark at the clamps"},{k:"눕혀 흐르므로 얇은 판·플렉스에 유리",e:"Lying flat suits thin cores and flex"}],
+    [{k:"설비 면적 · 투자",e:"Footprint and cost"},{k:"높은 조를 쓰므로 층고가 필요, 상대적으로 저렴",e:"Needs ceiling height for deep tanks; generally cheaper"},{k:"라인이 길어 바닥 면적이 크고 고가",e:"A long line: more floor area, higher capital cost"}],
+    [{k:"생산 형태",e:"Production style"},{k:"배치(batch) — 랙 단위",e:"Batch, by rack"},{k:"인라인 연속 — 앞뒤 공정과 직결 가능",e:"Continuous inline, linkable to the steps either side"}],
+    [{k:"대표 용도",e:"Typical use"},{k:"두껍고 층수 많은 일반 다층 기판",e:"Thick, high-layer-count conventional multilayers"},{k:"HDI·박판·미세회로, 균일도가 중요한 제품",e:"HDI, thin panels, fine lines — anything where uniformity rules"}],
+   ]}},
+  {hko:"3. 어느 쪽을 고르는가", hen:"3. How the choice is made", rows:[
+   {k:"판 두께와 홀 종횡비가 크다 → 수직식. 깊은 홀 안까지 도금액을 오래 접촉시킬 수 있다",
+    e:"Thick panels and high aspect-ratio holes → vertical: the bath stays in contact with deep holes for longer"},
+   {k:"표면 두께 편차 규격이 빡빡하다 → 수평식. 분사 방식이 면 전체를 고르게 때린다",
+    e:"Tight surface-thickness tolerance → horizontal: the spray hits the whole face evenly"},
+   {k:"얇은 코어·플렉스 → 수평식. 매달지 않으므로 변형과 클램프 자국이 없다",
+    e:"Thin cores and flex → horizontal: nothing hangs, so no sag and no clamp marks"},
+   {k:"소량 다품종 → 수직식. 랙 단위로 조건을 바꾸기 쉽다",
+    e:"High mix, low volume → vertical: conditions change rack by rack"},
+   {k:"앞뒤 공정과 연속 연결 → 수평식. 인라인 구성으로 대기 시간과 취급을 줄인다",
+    e:"Continuous linking to neighbouring steps → horizontal: inline layout cuts queue time and handling"},
+  ],
+   nko:"두 방식 모두 전류밀도·첨가제(광택제·억제제·평활제) 관리가 두께 분포를 좌우합니다. 설비 형태보다 관리 상태가 나쁘면 어느 쪽도 규격을 맞추지 못합니다.",
+   nen:"Either format lives or dies on current density and additive control (brightener, suppressor, leveller). A badly controlled line of either type will miss spec regardless of its geometry."},
+ ]},
+
+"defects":{
+ btn:"AOI 결함 도감 · AOI DEFECT GUIDE →",
+ eyebrow:"STEP 05 · 12 — AOI DEFECT GUIDE",
+ tko:"AOI 결함 도감 — 무엇을 고치고 무엇을 버리는가", ten:"AOI defect guide — what gets repaired and what gets scrapped",
+ lko:"AOI가 잡아내는 대표 결함과, 각각을 수리할 수 있는지 폐기해야 하는지의 판단 기준.",
+ len:"The defects AOI actually finds, and the rule for deciding whether each one can be repaired or has to be scrapped.",
+ sections:[
+  {hko:"1. AOI는 무엇을 보는가", hen:"1. What AOI is looking at",
+   pko:["AOI는 판넬을 고해상도로 촬영해 설계 데이터(Gerber)와 화소 단위로 비교합니다. 사람이 놓치는 미세한 차이를 잡아내지만, 판정하는 것은 '설계와 다르다'는 사실뿐입니다.",
+    "따라서 AOI가 표시한 좌표는 곧바로 불량이 아니라 '확인 대상'입니다. 검사원이 수리실(verification station)에서 실물을 보고 수리 / 폐기 / 오검출을 최종 판정합니다.",
+    "판정의 원리는 단순합니다 — 구리를 깎아내서 해결되는 결함은 수리할 수 있고, 없는 구리를 채워야 하는 결함은 대부분 수리할 수 없습니다."],
+   pen:["AOI photographs the panel at high resolution and compares it pixel by pixel against the Gerber data. It catches differences no inspector would see, but all it decides is that something differs from the design.",
+    "So a flagged coordinate is a place to look, not yet a reject. An operator at the verification station examines the real panel and makes the final call: repair, scrap, or false call.",
+    "The underlying rule is simple — if the fix is removing copper, it can be repaired; if the fix is adding copper that is not there, usually it cannot."]},
+  {hko:"2. 결함별 판정", hen:"2. Defect by defect",
+   table:{head:[{k:"결함",e:"Defect"},{k:"원인",e:"Typical cause"},{k:"수리",e:"Repair?"},{k:"설명",e:"Notes"}],nw:[2],rows:[
+    [{k:"쇼트 (단락)",e:"Short"},{k:"에칭 부족, D/F 이물",e:"Under-etch, debris on the dry film"},{k:"가능",e:"Yes"},{k:"여분의 구리를 칼로 긁어내면 회복된다. 가장 흔하고 가장 잘 고쳐지는 결함",e:"Scrape the surplus copper away; the commonest defect and the most reliably fixed"}],
+    [{k:"잔동 (구리 잔류)",e:"Copper residue"},{k:"현상 불량, 에칭액 순환 불량",e:"Poor development or etchant circulation"},{k:"가능",e:"Yes"},{k:"패턴 사이에 남은 구리 섬을 제거",e:"The stray island of copper is simply removed"}],
+    [{k:"프로트루전 (돌기)",e:"Protrusion / spur"},{k:"에칭 부족",e:"Under-etch"},{k:"가능",e:"Yes"},{k:"선폭 규격을 넘는 돌기만 다듬는다",e:"Trimmed back where it breaks the line-width spec"}],
+    [{k:"오픈 (단선)",e:"Open"},{k:"스크래치, D/F 결손, 과에칭",e:"Scratch, missing dry film, over-etch"},{k:"내층 불가",e:"Inner: no"},{k:"없는 구리를 채울 수 없다. 내층은 폐기, 외층은 고객 승인 하에 조건부 점퍼 수리",e:"You cannot replace missing copper. Inner layers are scrapped; an outer layer may take a jumper only with customer approval"}],
+    [{k:"니크 (Nick)",e:"Nick / mouse bite"},{k:"부분 과에칭, 이물",e:"Local over-etch or debris"},{k:"조건부",e:"Conditional"},{k:"남은 선폭이 규격(보통 설계폭의 70–80%) 이상이면 사용, 미만이면 폐기",e:"Passes if the remaining width stays above spec (commonly 70–80% of design), otherwise scrap"}],
+    [{k:"핀홀",e:"Pinhole"},{k:"D/F 기포·이물",e:"A bubble or speck in the dry film"},{k:"대부분 불가",e:"Usually no"},{k:"패드나 세선 위면 폐기. 넓은 전원면 위의 미세 핀홀은 규격에 따라 통과",e:"On a pad or a fine line, scrap; a tiny pinhole in a wide plane may pass on spec"}],
+    [{k:"미스레지스트레이션",e:"Misregistration"},{k:"노광 정합 오차, 재료 수축",e:"Exposure alignment error, material shrinkage"},{k:"불가",e:"No"},{k:"패턴 전체 위치가 틀어진 것이라 국부 수리로 해결되지 않는다",e:"The whole pattern sits in the wrong place; no local repair reaches it"}],
+    [{k:"D/F 잔사",e:"Dry-film residue"},{k:"현상 부족",e:"Incomplete development"},{k:"가능",e:"Yes"},{k:"재세정 후 재검사. 에칭 전이라면 재작업 가능",e:"Re-clean and re-inspect; before etch it can be reworked outright"}],
+    [{k:"과에칭 / 부족에칭",e:"Over- / under-etch"},{k:"라인 속도·농도·온도 이상",e:"Line speed, concentration or temperature drift"},{k:"조건부",e:"Conditional"},{k:"판넬 전체 경향이므로 개별 수리 대상이 아니라 라인 조건을 잡아야 한다",e:"A whole-panel trend: fix the line, not the panel"}],
+    [{k:"스크래치",e:"Scratch"},{k:"취급 불량",e:"Handling"},{k:"조건부",e:"Conditional"},{k:"구리가 끊겼으면 오픈으로, 얕으면 규격 내 통과",e:"If it breaks the copper it is an open; if shallow it passes on spec"}],
+   ]}},
+  {hko:"3. 판정 원칙 요약", hen:"3. The decision rule, in short", rows:[
+   {k:"구리를 빼면 되는 결함(쇼트·잔동·돌기) → 수리 가능",
+    e:"Defects fixed by taking copper away (shorts, residue, spurs) → repairable"},
+   {k:"구리를 넣어야 하는 결함(오픈·핀홀·깊은 니크) → 내층은 폐기",
+    e:"Defects that need copper added (opens, pinholes, deep nicks) → inner layers are scrapped"},
+   {k:"위치가 틀어진 결함(미스레지스트레이션) → 수리 불가",
+    e:"Defects of position (misregistration) → not repairable at all"},
+   {k:"외층 오픈의 점퍼 수리는 기술적으로 가능하나 고객 사양에서 금지되는 경우가 많다 — 반드시 사양 확인",
+    e:"Jumper repair of an outer-layer open is technically possible but many customer specs forbid it — always check first"},
+   {k:"내층 결함은 프레스 이후에는 접근 자체가 불가능하다. 그래서 05번 AOI가 마지막 방어선이다",
+    e:"After the press an inner-layer defect is physically unreachable, which is why the step 05 AOI is the last line of defence"},
+  ]},
+  {hko:"4. 오검출(false call) 관리", hen:"4. Managing false calls", rows:[
+   {k:"먼지·물자국·조명 반사는 결함으로 잡히지만 실제 불량이 아니다",
+    e:"Dust, water marks and light reflections get flagged but are not real defects"},
+   {k:"오검출이 많으면 검사원이 습관적으로 통과시키게 되므로, 진짜 결함을 놓치는 원인이 된다",
+    e:"A high false-call rate trains operators to wave things through — that is how real defects escape"},
+   {k:"감도를 높이면 검출률과 오검출이 함께 오른다. 제품 등급별로 감도 조건을 따로 관리한다",
+    e:"Raising sensitivity raises both detection and false calls, so sensitivity is set per product class"},
+   {k:"반복 위치에서 같은 결함이 나오면 개별 수리가 아니라 앞 공정(노광·현상·에칭)을 점검한다",
+    e:"The same defect at the same coordinate repeatedly means the upstream step needs attention, not the panel"},
+  ]},
+ ]},
+
 "glossary":{
  glossary:true,
  eyebrow:"GLOSSARY — 용어집",
@@ -636,6 +884,10 @@ var DETAILS={
  len:"Gold dotted-underline words throughout the page link here. Add a word and its description to the GLOSSARY list in the code and every occurrence links automatically.",
  sections:[]},
 };
+
+/* Extra detail pages linked from a step, on top of its own page.
+   Add a page id here to give that step another button. */
+var STEPPAGES={"05":["defects","oxide"],"06":["layup"],"07":["layup"],"10":["plating"],"12":["defects"]};
 
 var FLOOR={office3:0,pack3:0,psr3:0,aoi2:1,exp2:1,wet2:1,dsm2:1,plt2:1,wh1:2,lay1:2,prs1:2,trm1:2,drl1:2,emma1:2,out:3};
 var idx=0, timer=null, map=document.getElementById('map'), svg=null;
@@ -648,20 +900,22 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 var GKEYS=[];
 for(var gi=0;gi<GLOSSARY.length;gi++){
   var gks=[GLOSSARY[gi].t].concat(GLOSSARY[gi].m||[]);
-  for(var gj=0;gj<gks.length;gj++) GKEYS.push({k:gks[gj],t:GLOSSARY[gi].t});
+  for(var gj=0;gj<gks.length;gj++) GKEYS.push({k:gks[gj],t:GLOSSARY[gi].t,p:GLOSSARY[gi].p});
 }
 GKEYS.sort(function(a,b){return b.k.length-a.k.length});
 var GRE=new RegExp(GKEYS.map(function(x){
   var q=x.k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   return /^[\x00-\x7F]+$/.test(x.k)?'\\b'+q+'s?\\b':q;
 }).join('|'),'gi');
-function mark(s){
+function mark(s,pg){
   return esc(s).replace(GRE,function(w){
     var lw=w.toLowerCase(), sg=lw.replace(/s$/,'');
     for(var i=0;i<GKEYS.length;i++){
       var gk=GKEYS[i].k.toLowerCase();
-      if(gk===lw||gk===sg)
+      if(gk===lw||gk===sg){
+        if(pg&&GKEYS[i].p===pg) return w;
         return '<a class="g" href="#d/glossary/'+encodeURIComponent(GKEYS[i].t)+'">'+w+'</a>';
+      }
     }
     return w;
   });
@@ -679,7 +933,7 @@ function buildList(){
       +'<div class="cols"><ul class="ko">'+s.k.map(function(x){return '<li>'+mark(x)+'</li>'}).join('')+'</ul>'
       +'<ul class="en">'+s.e.map(function(x){return '<li>'+mark(x)+'</li>'}).join('')+'</ul></div>'
       +(s.mk?'<div class="mv"><span class="ko">'+esc(s.mk)+'</span><span class="en">'+esc(s.me)+'</span></div>':'')
-      +(DETAILS[s.n]?'<a class="more" href="#d/'+(DETAILS[s.n].first||s.n)+'">상세 페이지 DETAIL PAGE →</a>':'')
+      +pageLinks(s.n)
       +'</div></div>';
   }
   document.getElementById('steps').innerHTML=h;
@@ -695,6 +949,16 @@ function buildList(){
   }
 }
 
+/* One "more" button per detail page a step reaches. */
+function pageLinks(n){
+  var ids=[];
+  if(DETAILS[n]) ids.push(DETAILS[n].first||n);
+  ids=ids.concat(STEPPAGES[n]||[]);
+  return ids.map(function(id){
+    return '<a class="more" href="#d/'+id+'">'+esc((DETAILS[id]&&DETAILS[id].btn)||'상세 페이지 DETAIL PAGE →')+'</a>';
+  }).join('');
+}
+
 function cellHTML(c,f){
   f=f||esc;
   if(c&&typeof c==='object') return '<span class="ko">'+f(c.k)+'</span><span class="en">'+f(c.e)+'</span>';
@@ -703,7 +967,7 @@ function cellHTML(c,f){
 
 function openDetail(n,term){
   var D=DETAILS[n];
-  var mk=D.glossary?esc:mark;
+  var mk=D.glossary?esc:function(x){return mark(x,n)};
   var back=D.glossary
    ?'<a class="back" href="#" onclick="if(history.length>1){history.back();return false}">← 돌아가기 BACK</a>'
    :'<a class="back" href="#">← 돌아가기 BACK</a>';
@@ -743,7 +1007,9 @@ function openDetail(n,term){
     for(var g2=0;g2<GLOSSARY.length;g2++){
       var G=GLOSSARY[g2];
       h+='<div class="gent" data-t="'+esc(G.t)+'"><dt>'+esc(G.t)+(G.ge?'<span class="ge">'+esc(G.ge)+'</span>':'')+'</dt>'
-       +'<dd><span class="ko">'+esc(G.ko)+'</span> <span class="en">'+esc(G.en)+'</span></dd></div>';
+       +'<dd><span class="ko">'+esc(G.ko)+'</span> <span class="en">'+esc(G.en)+'</span>'
+       +(G.p&&DETAILS[G.p]?'<a class="more" href="#d/'+G.p+'">'+esc(DETAILS[G.p].btn)+'</a>':'')
+       +'</dd></div>';
     }
     h+='</dl></div>';
   }
