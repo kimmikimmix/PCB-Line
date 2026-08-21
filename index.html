@@ -38,6 +38,8 @@ button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);backgroun
 .mapwrap{position:relative;overflow-x:auto;padding-bottom:4px}
 .map{position:relative;min-width:660px}
 svg.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:3}
+.pulse-end{animation:pulseEnd 1.6s ease-in-out infinite}
+@keyframes pulseEnd{0%,100%{opacity:.2}50%{opacity:.95}}
 .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--silk-dim);opacity:.7;margin-bottom:8px}
 .floor{display:grid;grid-template-columns:36px repeat(12,1fr);gap:7px;margin-bottom:7px;position:relative;z-index:1}
 .flab{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--silk-dim);border-right:1px solid var(--edge)}
@@ -310,7 +312,14 @@ function anchor(id){
 }
 
 function mitre(pts,r){
+  var q=[pts[0]];
+  for(var z=1;z<pts.length;z++){
+    var last=q[q.length-1];
+    if(Math.hypot(pts[z][0]-last[0],pts[z][1]-last[1])>0.5) q.push(pts[z]);
+  }
+  pts=q;
   var d='M '+pts[0][0]+' '+pts[0][1];
+  if(pts.length<3) return pts.length<2?d:d+' L '+pts[1][0]+' '+pts[1][1];
   for(var i=1;i<pts.length-1;i++){
     var p=pts[i-1],v=pts[i],n=pts[i+1];
     var d1=Math.hypot(v[0]-p[0],v[1]-p[1]), d2=Math.hypot(n[0]-v[0],n[1]-v[1]);
@@ -378,6 +387,12 @@ function drawTrace(){
     p.style.transition='stroke-dashoffset .75s cubic-bezier(.4,0,.2,1)';
     p.style.strokeDashoffset=0;
   }
+  var end=p.getPointAtLength(len);
+  var ring=ns('circle'); ring.setAttribute('cx',end.x); ring.setAttribute('cy',end.y);
+  ring.setAttribute('r','8'); ring.setAttribute('fill','none');
+  ring.setAttribute('stroke','#E0B44C'); ring.setAttribute('stroke-width','1.5');
+  ring.setAttribute('class','pulse-end');
+  svg.appendChild(ring);
   var tok=ns('rect'); tok.setAttribute('width','11'); tok.setAttribute('height','8');
   tok.setAttribute('rx','1.5'); tok.setAttribute('fill','#E0B44C');
   svg.appendChild(tok);
