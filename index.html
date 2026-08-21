@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Line Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F1F4F0;
+    --surface: #FBFCFA;
+    --ink: #1C2420;
+    --muted: #5B6862;
+    --line: #D3DCD4;
+    --accent: #B4642D;
+    --accent-soft: #F3E4D5;
+    --room-fill: #E4EBE3;
+    --room-stroke: #9DB2A2;
+    --room-hover: #EEF3EC;
+    --trace: #B4642D;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101B14;
+      --surface: #17251C;
+      --ink: #E8EFE8;
+      --muted: #93A698;
+      --line: #2A4033;
+      --accent: #E0954F;
+      --accent-soft: #3A2C1C;
+      --room-fill: #1E3A29;
+      --room-stroke: #43704F;
+      --room-hover: #26492F;
+      --trace: #E0954F;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101B14;
+    --surface: #17251C;
+    --ink: #E8EFE8;
+    --muted: #93A698;
+    --line: #2A4033;
+    --accent: #E0954F;
+    --accent-soft: #3A2C1C;
+    --room-fill: #1E3A29;
+    --room-stroke: #43704F;
+    --room-hover: #26492F;
+    --trace: #E0954F;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  header { margin-bottom: 1.5rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.35rem;
+  }
+  h1 {
+    font-family: "Chakra Petch", "IBM Plex Sans", sans-serif;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    font-weight: 700;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .subtitle { color: var(--muted); margin: 0.4rem 0 0; }
+
+  .map-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.75rem;
+    overflow-x: auto;
+  }
+  .map-card svg {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+  }
+
+  /* SVG parts */
+  .building { fill: none; stroke: var(--line); stroke-width: 2; }
+  .room rect {
+    fill: var(--room-fill);
+    stroke: var(--room-stroke);
+    stroke-width: 1.5;
+    transition: fill 0.15s, stroke 0.15s;
+  }
+  .room { cursor: pointer; outline: none; }
+  .room:hover rect { fill: var(--room-hover); stroke: var(--accent); }
+  .room:focus-visible rect { stroke: var(--accent); stroke-width: 3; }
+  .room.active rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.5; }
+  .room-name {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    fill: var(--ink);
+    text-anchor: middle;
+    pointer-events: none;
+  }
+  .room-badge {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    fill: var(--muted);
+    pointer-events: none;
+  }
+  .room.active .room-badge { fill: var(--accent); }
+  .trace {
+    fill: none;
+    stroke: var(--trace);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .trace-arrow { fill: var(--trace); }
+  @media (prefers-reduced-motion: reduce) {
+    .room rect { transition: none; }
+  }
+
+  /* Detail panel */
+  .panel {
+    margin-top: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.5rem 1.75rem;
+    min-height: 12rem;
+  }
+  .panel .placeholder { color: var(--muted); margin: 0; }
+  .panel-eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.3rem;
+  }
+  .panel h2 {
+    font-family: "Chakra Petch", sans-serif;
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem;
+  }
+  .panel .summary { margin: 0 0 1rem; max-width: 62ch; }
+  .steps { list-style: none; margin: 0; padding: 0; max-width: 62ch; }
+  .steps li {
+    display: flex;
+    gap: 0.8rem;
+    padding: 0.45rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .steps li:first-child { border-top: none; }
+  .steps .n {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding-top: 0.15rem;
+    min-width: 1.6rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .panel-nav {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+  .panel-nav button {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+  }
+  .panel-nav button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .panel-nav button:disabled { opacity: 0.4; cursor: default; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Facility Flow</p>
+    <h1 id="title"></h1>
+    <p class="subtitle" id="subtitle"></p>
+  </header>
+
+  <div class="map-card">
+    <svg id="map" viewBox="0 0 1000 560" role="group" aria-label="Facility floor plan">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="trace-arrow" d="M 0 0 L 10 5 L 0 10 z"></path>
+        </marker>
+      </defs>
+      <rect class="building" x="18" y="26" width="964" height="508" rx="6"></rect>
+      <g id="traces"></g>
+      <g id="rooms"></g>
+    </svg>
+  </div>
+
+  <section class="panel" id="panel" aria-live="polite">
+    <p class="placeholder">Click a room on the map to see its process and steps.</p>
+  </section>
+</div>
+
+<script>
+/* ============================================================
+   EDIT YOUR DATA HERE
+   ------------------------------------------------------------
+   1. FACILITY  — page title and subtitle.
+   2. ROOMS     — one entry per room. Position (x, y) and size
+                  (w, h) place it on the map (the map canvas is
+                  1000 wide x 560 tall). name/summary/steps are
+                  what shows in the panel when clicked.
+   3. ROUTE     — the order material flows through the rooms,
+                  by room id. Arrows are drawn automatically
+                  between consecutive rooms.
+   ============================================================ */
+
+const FACILITY = {
+  title: "PCB Production Line",
+  subtitle: "Click any room to see the process that happens there.",
+};
+
+const ROOMS = [
+  { id: "prep", x: 30, y: 40, w: 200, h: 120,
+    name: "Material Prep",
+    summary: "Copper-clad laminate is received, inspected, and cut into working panels.",
+    steps: [
+      "Receive and inspect laminate sheets",
+      "Cut sheets to panel size",
+      "Round corners and clean edges",
+      "Bake panels to remove moisture",
+    ] },
+  { id: "inner-imaging", x: 270, y: 40, w: 200, h: 120,
+    name: "Inner Layer Imaging",
+    summary: "Inner-layer circuit patterns are transferred onto the panels with photoresist.",
+    steps: [
+      "Clean panel surface",
+      "Apply dry-film photoresist",
+      "Expose the circuit image",
+      "Develop away unexposed resist",
+    ] },
+  { id: "etch-aoi", x: 510, y: 40, w: 200, h: 120,
+    name: "Etch & AOI",
+    summary: "Unwanted copper is etched away and every layer is optically inspected.",
+    steps: [
+      "Etch exposed copper",
+      "Strip remaining resist",
+      "Automated optical inspection (AOI)",
+      "Flag defects for repair or scrap",
+    ] },
+  { id: "lamination", x: 750, y: 40, w: 200, h: 120,
+    name: "Lamination",
+    summary: "Inner layers, prepreg, and copper foil are pressed into a single board.",
+    steps: [
+      "Apply oxide bonding treatment",
+      "Lay up cores, prepreg, and foil",
+      "Press under heat and pressure",
+      "Cool and trim the panels",
+    ] },
+  { id: "drilling", x: 750, y: 220, w: 200, h: 120,
+    name: "Drilling",
+    summary: "Through-holes and vias are drilled and prepared for plating.",
+    steps: [
+      "X-ray align to inner layers",
+      "Drill through-holes and vias",
+      "Deburr and desmear holes",
+    ] },
+  { id: "plating", x: 510, y: 220, w: 200, h: 120,
+    name: "Plating",
+    summary: "Copper is deposited into the drilled holes to connect the layers.",
+    steps: [
+      "Electroless copper deposition",
+      "Panel electroplating",
+      "Verify plating thickness",
+    ] },
+  { id: "outer-imaging", x: 270, y: 220, w: 200, h: 120,
+    name: "Outer Layer Imaging",
+    summary: "Outer-layer patterns are imaged, plated, and etched.",
+    steps: [
+      "Apply photoresist",
+      "Expose and develop outer pattern",
+      "Pattern plate copper and tin",
+      "Strip resist, etch, strip tin",
+    ] },
+  { id: "solder-mask", x: 30, y: 220, w: 200, h: 120,
+    name: "Solder Mask",
+    summary: "The protective solder mask coating is applied and cured.",
+    steps: [
+      "Clean and prep the surface",
+      "Coat with solder mask",
+      "Expose and develop openings",
+      "Thermal cure",
+    ] },
+  { id: "silkscreen", x: 30, y: 400, w: 200, h: 120,
+    name: "Silkscreen",
+    summary: "Legend text and markings are printed onto the boards.",
+    steps: [
+      "Print legend ink",
+      "Cure the ink",
+      "Verify markings",
+    ] },
+  { id: "surface-finish", x: 270, y: 400, w: 200, h: 120,
+    name: "Surface Finish",
+    summary: "Exposed copper pads get a solderable protective finish.",
+    steps: [
+      "Apply finish (HASL, ENIG, or OSP)",
+      "Check thickness and solderability",
+    ] },
+  { id: "rout-etest", x: 510, y: 400, w: 200, h: 120,
+    name: "Routing & E-Test",
+    summary: "Boards are cut to final shape and electrically tested.",
+    steps: [
+      "Rout or V-score board profiles",
+      "Flying-probe or bed-of-nails test",
+      "Mark and remove failures",
+    ] },
+  { id: "inspect-pack", x: 750, y: 400, w: 200, h: 120,
+    name: "Inspection & Packing",
+    summary: "Finished boards are inspected, packed, and shipped.",
+    steps: [
+      "Final visual and dimensional inspection",
+      "Clean and vacuum pack",
+      "Label and ship",
+    ] },
+];
+
+const ROUTE = [
+  "prep", "inner-imaging", "etch-aoi", "lamination",
+  "drilling", "plating", "outer-imaging", "solder-mask",
+  "silkscreen", "surface-finish", "rout-etest", "inspect-pack",
+];
+
+/* ============================================================
+   RENDERING — you shouldn't need to edit below this line.
+   ============================================================ */
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const roomById = Object.fromEntries(ROOMS.map(r => [r.id, r]));
+let activeId = null;
+
+document.getElementById("title").textContent = FACILITY.title;
+document.getElementById("subtitle").textContent = FACILITY.subtitle;
+document.title = FACILITY.title;
+
+function el(tag, attrs = {}) {
+  const node = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  return node;
+}
+
+function center(r) { return { x: r.x + r.w / 2, y: r.y + r.h / 2 }; }
+
+/* Draw an orthogonal connector from room a to room b, edge to edge. */
+function tracePath(a, b) {
+  const ca = center(a), cb = center(b);
+  const dx = cb.x - ca.x, dy = cb.y - ca.y;
+  if (Math.abs(dy) < 10) {
+    // same row: horizontal
+    const x1 = dx > 0 ? a.x + a.w : a.x;
+    const x2 = dx > 0 ? b.x : b.x + b.w;
+    return `M ${x1} ${ca.y} L ${x2} ${cb.y}`;
+  }
+  if (Math.abs(dx) < 10) {
+    // same column: vertical
+    const y1 = dy > 0 ? a.y + a.h : a.y;
+    const y2 = dy > 0 ? b.y : b.y + b.h;
+    return `M ${ca.x} ${y1} L ${ca.x} ${y2}`;
+  }
+  // L-shape: leave a horizontally, arrive at b vertically
+  const x1 = dx > 0 ? a.x + a.w : a.x;
+  const y2 = dy > 0 ? b.y : b.y + b.h;
+  return `M ${x1} ${ca.y} L ${cb.x} ${ca.y} L ${cb.x} ${y2}`;
+}
+
+function drawTraces() {
+  const g = document.getElementById("traces");
+  for (let i = 0; i < ROUTE.length - 1; i++) {
+    const a = roomById[ROUTE[i]], b = roomById[ROUTE[i + 1]];
+    if (!a || !b) continue;
+    const path = el("path", { d: tracePath(a, b), class: "trace", "marker-end": "url(#arrow)" });
+    g.appendChild(path);
+  }
+}
+
+/* Greedy word-wrap for room labels inside the box width. */
+function wrapLabel(name, maxWidth) {
+  const maxChars = Math.max(8, Math.floor(maxWidth / 9));
+  const words = name.split(" ");
+  const lines = [];
+  let line = "";
+  for (const w of words) {
+    if (line && (line + " " + w).length > maxChars) { lines.push(line); line = w; }
+    else line = line ? line + " " + w : w;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function drawRooms() {
+  const g = document.getElementById("rooms");
+  for (const room of ROOMS) {
+    const stage = ROUTE.indexOf(room.id);
+    const group = el("g", { class: "room", tabindex: "0", role: "button", "data-id": room.id });
+    group.setAttribute("aria-label", room.name);
+    group.appendChild(el("rect", { x: room.x, y: room.y, width: room.w, height: room.h, rx: 4 }));
+
+    if (stage !== -1) {
+      const badge = el("text", { class: "room-badge", x: room.x + 12, y: room.y + 22 });
+      badge.textContent = String(stage + 1).padStart(2, "0");
+      group.appendChild(badge);
+    }
+
+    const lines = wrapLabel(room.name, room.w - 24);
+    const c = center(room);
+    const startY = c.y - ((lines.length - 1) * 18) / 2 + 5;
+    lines.forEach((text, i) => {
+      const t = el("text", { class: "room-name", x: c.x, y: startY + i * 18 });
+      t.textContent = text;
+      group.appendChild(t);
+    });
+
+    group.addEventListener("click", () => selectRoom(room.id));
+    group.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectRoom(room.id); }
+    });
+    g.appendChild(group);
+  }
+}
+
+function selectRoom(id) {
+  activeId = id;
+  document.querySelectorAll(".room").forEach(r =>
+    r.classList.toggle("active", r.dataset.id === id));
+  renderPanel(roomById[id]);
+}
+
+function renderPanel(room) {
+  const panel = document.getElementById("panel");
+  const stage = ROUTE.indexOf(room.id);
+  const eyebrow = stage !== -1
+    ? `Stage ${String(stage + 1).padStart(2, "0")} / ${String(ROUTE.length).padStart(2, "0")}`
+    : "Support Area";
+
+  panel.innerHTML = "";
+
+  const eb = document.createElement("p");
+  eb.className = "panel-eyebrow";
+  eb.textContent = eyebrow;
+  panel.appendChild(eb);
+
+  const h2 = document.createElement("h2");
+  h2.textContent = room.name;
+  panel.appendChild(h2);
+
+  if (room.summary) {
+    const p = document.createElement("p");
+    p.className = "summary";
+    p.textContent = room.summary;
+    panel.appendChild(p);
+  }
+
+  if (room.steps && room.steps.length) {
+    const ol = document.createElement("ol");
+    ol.className = "steps";
+    room.steps.forEach((step, i) => {
+      const li = document.createElement("li");
+      const n = document.createElement("span");
+      n.className = "n";
+      n.textContent = String(i + 1).padStart(2, "0");
+      const s = document.createElement("span");
+      s.textContent = step;
+      li.appendChild(n);
+      li.appendChild(s);
+      ol.appendChild(li);
+    });
+    panel.appendChild(ol);
+  }
+
+  if (stage !== -1) {
+    const nav = document.createElement("div");
+    nav.className = "panel-nav";
+    const prev = document.createElement("button");
+    prev.textContent = "← Previous step";
+    prev.disabled = stage === 0;
+    prev.addEventListener("click", () => selectRoom(ROUTE[stage - 1]));
+    const next = document.createElement("button");
+    next.textContent = "Next step →";
+    next.disabled = stage === ROUTE.length - 1;
+    next.addEventListener("click", () => selectRoom(ROUTE[stage + 1]));
+    nav.appendChild(prev);
+    nav.appendChild(next);
+    panel.appendChild(nav);
+  }
+}
+
+drawTraces();
+drawRooms();
+</script>
+</body>
+</html>
