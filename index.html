@@ -60,6 +60,8 @@ svg.trace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;o
 .rm.off.live{background:rgba(201,189,130,.09);box-shadow:0 0 0 1px var(--gold)}
 .rm .dtl{position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--board);background:var(--gold);border-radius:2px;padding:2px 6px;opacity:0;pointer-events:none;transition:opacity .15s;cursor:pointer}
 .rm:hover .dtl,.rm:focus-visible .dtl{opacity:1;pointer-events:auto}
+.rm.nextup{outline-offset:2px;animation:nextBlink .62s ease-in-out infinite}
+@keyframes nextBlink{0%,100%{outline:2px solid rgba(224,180,76,0)}50%{outline:2px solid rgba(224,180,76,.95)}}
 .gap{grid-column:span 4}
 .gap6{grid-column:span 6}
 
@@ -131,6 +133,9 @@ body.detail-open{overflow:hidden}
 .dtbl td.nw{white-space:nowrap;font-family:var(--mono);font-size:12px}
 .dtbl td .ko{display:block}
 .dtbl td .en{display:block;color:var(--silk-dim);font-size:12px}
+.dfig{margin:14px 0 6px;padding:14px 10px;border:1px solid var(--edge);border-radius:3px;background:rgba(14,58,43,.45);overflow-x:auto}
+.dfig svg{display:block;margin:0 auto;max-width:100%;height:auto;color:var(--silk)}
+.dfig figcaption{font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--silk-dim);margin-top:11px;text-align:center}
 .dnote{font-family:var(--mono);font-size:11px;color:var(--silk-dim);line-height:1.7;margin:10px 0 0}
 body.ko .dtbl .en,body.ko .dpara .en,body.ko .dnote .en{display:none}
 body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
@@ -175,6 +180,8 @@ body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
   .h5,.cols .en li,.loc{color:#555}
   .cols{grid-template-columns:1fr 1fr!important}
   .cols li{font-size:8pt;line-height:1.35}
+  .dfig{background:none;border:.5pt solid #999}
+  .dfig svg{color:#111}
   .mv{color:#666}
   .mv::before{background:#666}
   body.ko .en,body.en .ko{display:revert}
@@ -487,13 +494,13 @@ var GLOSSARY=[
 {t:"기준홀",ge:"Tooling hole",m:["tooling hole","reference hole"],
  ko:"모든 공정에서 판넬의 위치를 같은 기준으로 잡기 위해 뚫는 정합용 구멍. 층간 정합(registration)의 기준이 되며, POSA 등 전용 장비로 가공한다.",
  en:"Reference holes drilled so every later machine grips the panel the same way. They are the datum for layer-to-layer registration and are cut on dedicated equipment such as the POSA."},
-{t:"WET",ge:"Wet process",m:["습식"],
+{t:"WET",ge:"Wet process",p:"wetline",m:["습식"],
  ko:"약품과 물을 사용하는 공정의 통칭 — 탈지·마이크로에칭·현상·에칭·박리·수세가 모두 여기에 속한다.",
  en:"The umbrella term for any chemical/water process: degreasing, micro-etching, developing, etching, stripping and rinsing."},
-{t:"DES",ge:"Develop–Etch–Strip",m:["DES 라인"],
+{t:"DES",ge:"Develop–Etch–Strip",p:"wetline",m:["DES 라인"],
  ko:"현상(Develop) → 에칭(Etch) → 박리(Strip)를 한 줄로 이어 놓은 라인. 노광된 D/F를 현상해 패턴을 드러내고, 노출된 구리를 에칭하고, 남은 D/F를 벗겨 회로만 남긴다.",
  en:"One conveyorised line running Develop, Etch and Strip in sequence: develop the exposed dry film, etch the bared copper away, then strip the remaining film to leave the circuit."},
-{t:"수세",ge:"Rinsing",m:["rinse","고압수세"],
+{t:"수세",ge:"Rinsing",p:"wetline",m:["rinse","고압수세"],
  ko:"공정 사이에 약품과 이물을 씻어내는 단계. 통상 탈지 → 마이크로에칭(산세) → 1차 수세 → 순수(DI) 수세 → 에어나이프 건조 순으로 진행하며, 앞 공정 약품이 다음 조로 넘어가지 않도록 다단(cascade)으로 흘린다. 드릴링 뒤에는 홀 안의 절삭 분말을 밀어내기 위해 고압수세를 먼저 건다.",
  en:"Washing chemistry and debris off between steps. The usual order is degrease → micro-etch (acid) → first rinse → DI (deionised) rinse → air-knife dry, run as a cascade so carry-over never reaches the next tank. After drilling, a high-pressure rinse comes first to flush swarf out of the holes."},
 {t:"SMT land",ge:"SMT land / pad",m:["랜드","pad"],
@@ -520,6 +527,30 @@ var GLOSSARY=[
 {t:"전기도금",ge:"Electroplating",p:"plating",m:["electroplating","electrolytic"],
  ko:"전류를 걸어 홀 내벽과 표면에 구리를 두껍게 입히는 공정. 얇게 도전층만 입히는 무전해(화학)도금 뒤에 이어지며, 설비는 판넬을 세워 담그는 수직식과 눕혀 흘리는 수평식 두 방식이 있다.",
  en:"Building copper thickness on the hole walls and surface by passing current through the bath. It follows the thin electroless (chemical) seed layer, and the equipment comes in two forms: vertical, where panels hang in the tank, and horizontal, where they travel flat."},
+{t:"laminate",ge:"Laminate",m:["라미네이트","적층판"],
+ ko:"유리섬유 직물에 수지를 함침시켜 굳힌 판재. 양면에 동박이 붙은 것이 CCL이며, 경화가 끝난 것을 코어, 반경화 상태를 프리프레그라 부른다. 흔히 '원판'이라고 하는 것이 이것이다.",
+ en:"The board material itself: glass cloth impregnated with resin and cured hard. With copper bonded to both faces it is a CCL; fully cured it is a core, half-cured it is prepreg."},
+{t:"리플로우",ge:"Reflow soldering",m:["reflow"],
+ ko:"완성된 기판에 부품을 올린 뒤 오븐을 통과시켜 솔더 페이스트를 녹여 붙이는 실장 공정. 무연 솔더는 약 245–260 °C까지 올라가며, 기판은 이 온도를 보통 2–3회 견뎌야 한다. High-Tg·고 Td 자재를 쓰는 이유가 바로 이것이다.",
+ en:"The assembly step where a populated board passes through an oven that melts the solder paste. Lead-free peaks around 245–260 °C, and a board typically has to survive two or three passes — which is precisely why high-Tg, high-Td materials exist."},
+{t:"GHz",ge:"Gigahertz",p:"ghz",m:["기가헤르츠","MHz","Gbps"],
+ ko:"주파수의 단위. 1 GHz는 신호가 1초에 10억 번 진동한다는 뜻이다. 주파수가 올라갈수록 기판 자재의 Dk·Df와 동박 거칠기가 신호를 갉아먹기 시작하므로, 자재 선정과 가공 조건이 완전히 달라진다.",
+ en:"The unit of frequency: 1 GHz means the signal swings a billion times a second. As frequency climbs, the laminate's Dk and Df and the roughness of the copper start eating the signal — which is what changes the material choice and the process."},
+{t:"Dk",ge:"Dielectric constant (εr)",p:"ghz",m:["유전율"],
+ ko:"자재가 신호를 얼마나 느리게 하는지를 나타내는 값. 50 Ω 임피던스를 맞추는 데 필요한 선폭과 유전체 두께를 결정한다. FR-4는 약 4.4, RF용 PTFE는 2.2 수준.",
+ en:"How much the material slows a signal down. It sets the trace width and dielectric thickness needed to hit 50 Ω. FR-4 is around 4.4; RF-grade PTFE is about 2.2."},
+{t:"Df",ge:"Dissipation factor (tanδ)",p:"ghz",m:["유전손실","tanδ"],
+ ko:"신호 에너지 중 자재가 열로 흡수해 버리는 비율. 가격을 가르는 바로 그 숫자로, 0.020이면 일반 FR-4, 0.001이면 PTFE급이다. 한 단계 낮출 때마다 자재비는 대략 두 배가 된다.",
+ en:"The fraction of signal energy the material turns into heat. It is the number that separates cheap from expensive: 0.020 is ordinary FR-4, 0.001 is PTFE class, and each step down roughly doubles the price."},
+{t:"EMMA",ge:"Electrical test",p:"emma",m:["EMMA 검사"],
+ ko:"완성된 보드의 모든 회로가 설계대로 이어져 있고 이어지면 안 될 곳은 끊겨 있는지 전기적으로 확인하는 검사. AOI가 '보이는' 결함을 잡는다면 전기검사는 '보이지 않는' 단선·단락을 잡는다.",
+ en:"The electrical test that checks every net on a finished board is connected where it should be and isolated where it should be. AOI catches what can be seen; electrical test catches the opens and shorts that cannot."},
+{t:"BBT",ge:"Bare-board test",p:"emma",m:["전기검사","bare board test"],
+ ko:"부품을 올리기 전 맨 기판 상태에서 하는 전기검사의 총칭. 전용 지그(bed of nails)로 모든 네트를 한 번에 찍는 방식과, 프로브가 한 점씩 옮겨 다니는 플라잉 프로브 방식이 있다.",
+ en:"Bare-board test: the electrical test done before any components are fitted. It is run either with a dedicated bed-of-nails fixture that touches every net at once, or with flying probes that move point to point."},
+{t:"플라잉 프로브",ge:"Flying probe",m:["flying probe"],
+ ko:"움직이는 탐침 몇 개가 네트를 하나씩 찾아다니며 측정하는 전기검사 방식. 지그가 필요 없어 시제품·소량 생산에 적합하지만 느리다.",
+ en:"An electrical test where a few moving probes travel from net to net. No fixture is needed, so it suits prototypes and small runs, but it is slow."},
 {t:"defect",ge:"Defect",p:"defects",m:["결함","디펙트"],
  ko:"설계 데이터와 다른 모든 이상 — 쇼트·오픈·니크·잔동 등. AOI가 검출하며, 구리를 깎아내면 되는 결함은 수리하고 구리를 채워야 하는 결함은 대부분 폐기한다.",
  en:"Any departure from the design data — shorts, opens, nicks, copper residue and so on. AOI finds them; the ones fixed by removing copper are repaired, the ones needing copper added are usually scrapped."}
@@ -576,7 +607,8 @@ var DETAILS={
  tko:"원자재(CCL) 참고 가이드", ten:"Copper-clad laminate reference guide",
  lko:"승인 리스트의 모든 원판 — 무엇이고, 비용이 어떻게 되고, 언제 쓰는가. PCB 제조 입문자 기준으로 정리.",
  len:"Every laminate on our approved list — what it is, what it costs you, and when to use it. Written for someone new to PCB manufacturing.",
- links:[{href:"#d/02",txt:"창고 · 재단 상세 (원판 종류·두께·보관) · STORE & CUTTING DETAIL →"}],
+ links:[{href:"#d/02",txt:"창고 · 재단 상세 (원판 종류·두께·보관) · STORE & CUTTING DETAIL →"},
+  {href:"#d/ghz",txt:"주파수와 기판 — GHz · Dk · Df 입문 · FREQUENCY EXPLAINED →"}],
  sections:[
   {hko:"1. CCL이란 무엇인가", hen:"1. Start here: what a CCL actually is",
    pko:["PCB는 구리 전선으로 만드는 것이 아닙니다. 절연 기재의 겉면에 동박(구리 호일)을 붙인 평판에서, 필요 없는 구리를 화학적으로 에칭해 회로를 만듭니다. 이 '절연체 + 동박' 판이 바로 CCL(Copper-Clad Laminate, 동박적층판)입니다.",
@@ -768,7 +800,33 @@ var DETAILS={
    {k:"임피던스 — 유전체 두께가 곧 임피던스이므로 설계 스택업을 임의로 대체하지 않는다",
     e:"Impedance — dielectric thickness *is* the impedance, so never substitute a stack-up on the floor"},
   ]},
-  {hko:"4. 대표 불량", hen:"4. Typical failures", rows:[
+  {hko:"4. 프레스 조건 — 온도와 시간", hen:"4. Press conditions — temperature and time",
+   pko:["프레스는 '눌러 붙이는' 작업이 아니라 수지를 녹여 흘리고, 완전히 경화시키고, 응력 없이 식히는 열 사이클입니다. 그래서 조건은 최고 온도 하나가 아니라 곡선 전체로 지정됩니다.",
+    "핵심은 수지가 가장 묽어지는 구간(최저 점도)에 맞춰 압력을 올리는 것입니다. 너무 일찍 누르면 수지가 다 빠져나가 수지 부족이 되고, 너무 늦게 누르면 이미 굳기 시작해 보이드가 남습니다."],
+   pen:["The press is not a squashing operation — it is a thermal cycle that melts the resin, makes it flow, cures it fully and then cools it without locking stress in. That is why a recipe is a whole curve, not one temperature.",
+    "The critical judgement is applying full pressure at the resin's minimum viscosity. Too early and the resin squeezes out, starving the joint; too late and it has begun to gel, leaving voids."],
+   table:{head:[{k:"구간",e:"Phase"},{k:"대표 조건",e:"Typical setting"},{k:"의미",e:"What it is doing"}],nw:[0],rows:[
+    [{k:"승온 속도",e:"Heat-up rate"},{k:"1.5–4 °C/분",e:"1.5–4 °C per minute"},{k:"너무 빠르면 수지가 고르게 흐르기 전에 굳는다",e:"Too fast and the resin gels before it has flowed evenly"}],
+    [{k:"초기(키스) 압력",e:"Kiss pressure"},{k:"약 3–7 bar",e:"About 3–7 bar"},{k:"층을 잡아두되 수지를 밀어내지 않는 정도",e:"Holds the stack without pushing resin out yet"}],
+    [{k:"본 압력",e:"Full pressure"},{k:"약 15–25 bar (제품·자재별)",e:"About 15–25 bar, depending on product and material"},{k:"최저 점도 구간에서 인가 — 수지 흐름과 밀착을 완성",e:"Applied at minimum viscosity to complete flow and wet-out"}],
+    [{k:"경화 온도 유지",e:"Cure hold"},{k:"일반 FR-4 약 175–185 °C",e:"Standard FR-4 about 175–185 °C"},{k:"보통 60–90분 유지",e:"Typically held 60–90 minutes"}],
+    [{k:"",e:""},{k:"High-Tg FR-4 약 185–200 °C",e:"High-Tg FR-4 about 185–200 °C"},{k:"90–120분 — Tg가 높을수록 오래 걸린다",e:"90–120 minutes; the higher the Tg, the longer the hold"}],
+    [{k:"",e:""},{k:"폴리이미드 약 220–230 °C",e:"Polyimide about 220–230 °C"},{k:"프레스 후 별도 후경화(post-bake) 수 시간 필요",e:"Needs a separate post-bake of several hours afterwards"}],
+    [{k:"",e:""},{k:"PTFE계 300 °C 이상",e:"PTFE-based above 300 °C"},{k:"융착(fusion bonding) — 전용 프레스가 필요하며 일반 라인에서 불가",e:"Fusion bonding: needs a dedicated press, not possible on a standard line"}],
+    [{k:"냉각",e:"Cool-down"},{k:"2–5 °C/분, 약 30분",e:"2–5 °C per minute, about 30 minutes"},{k:"급랭하면 층간 응력이 남아 휨이 생긴다",e:"Cooling fast locks stress into the stack and the panel warps"}],
+   ]},
+   nko:"위 수치는 각 자재군의 데이터시트에 통상 제시되는 대표값입니다. 실제 사이클(승온 속도·압력 인가 시점·유지 시간)은 자재 제조사가 자재별·두께별로 지정하므로, 반드시 해당 로트의 데이터시트와 협력사 라미네이션 가이드를 기준으로 확정해야 합니다. 여기 값을 그대로 설비에 입력하지 마십시오.",
+   nen:"These are representative figures of the kind each material family's datasheet carries. The real cycle — ramp rate, when pressure comes on, how long it holds — is specified by the laminate maker per material and per thickness, so it must be set from the datasheet for the lot in hand and the fabricator's lamination guide. Do not type these numbers into a press."},
+  {hko:"5. 다루기 까다로운 자재", hen:"5. The materials that are fragile to handle",
+   table:{head:[{k:"자재",e:"Material"},{k:"무엇이 취약한가",e:"What makes it fragile"},{k:"현장 대응",e:"What the floor does about it"}],nw:[0],rows:[
+    [{k:"PTFE (RT/duroid, TLY 등)",e:"PTFE (RT/duroid, TLY…)"},{k:"무르고 잘 늘어남(cold flow). 드릴 시 뭉개지고 홀 내벽에 스미어가 심하다",e:"Soft and prone to cold flow; it smears rather than cuts when drilled"},{k:"전용 드릴 조건, 플라즈마 홀 처리, 융착 전용 프레스",e:"Special drill parameters, plasma hole prep, a fusion-bonding press"}],
+    [{k:"폴리이미드 (35N·85N·VT-901)",e:"Polyimide (35N, 85N, VT-901)"},{k:"흡습성이 커서 수분을 머금은 채 가열하면 층간 팽창·박리",e:"Absorbs moisture; heat it wet and steam delaminates the stack"},{k:"프레스·실장 전 반드시 베이킹, 방습 보관",e:"Bake before pressing and before assembly; store dry"}],
+    [{k:"세라믹 충전 고 Dk (RO3010·RT6010)",e:"High-Dk ceramic-filled (RO3010, RT6010)"},{k:"취성이 크고 Z축 CTE가 커서 다층에서 홀이 찢어지기 쉽다",e:"Brittle, with a high Z-axis CTE that tears plated holes in multilayers"},{k:"취급 시 굽힘 금지, 스택업에서 유리 보강 등급으로 대체 검토",e:"Never flex it; consider a glass-reinforced grade in a multilayer"}],
+    [{k:"박판 코어 (0.1 mm 이하)",e:"Thin cores (0.1 mm and under)"},{k:"자중으로 처지고 주름·찢어짐이 생긴다",e:"Sags under its own weight, wrinkles and tears"},{k:"수평식 라인 사용, 전용 캐리어로 이송",e:"Run on horizontal lines, moved on dedicated carriers"}],
+    [{k:"메탈 코어 / IMS (VT-4B5)",e:"Metal core / IMS (VT-4B5)"},{k:"일반 적층재가 아니며 열팽창이 전혀 다르다",e:"Not a normal signal laminate; its expansion behaves nothing like one"},{k:"별도 공정 — 표준 스택업 규칙을 적용하지 않는다",e:"A separate process; the standard stack-up rules do not apply"}],
+    [{k:"산화 처리된 내층",e:"Any freshly oxidised inner layer"},{k:"지문 하나로 접착력이 떨어진다",e:"One fingerprint costs bond strength"},{k:"장갑 착용, 가장자리만 취급, 대기 시간 제한",e:"Gloves, edges only, capped queue time"}],
+   ]}},
+  {hko:"6. 대표 불량", hen:"6. Typical failures", rows:[
    {k:"미스레지스트레이션 — 가접 불량이나 핀 유격으로 층이 어긋남. 내층은 수리 불가",
     e:"Misregistration — weak tacking or loose pins let layers shift; inner layers cannot be repaired"},
    {k:"보이드(기포) — 수지량 부족, 진공 불량, 산화면 오염",
@@ -876,6 +934,167 @@ var DETAILS={
   ]},
  ]},
 
+"wetline":{
+ btn:"WET · DES 라인 상세 · WET LINE IN DETAIL →",
+ eyebrow:"STEP 03 · 04 · 11 — WET AND DES LINE",
+ tko:"WET · DES실 — 약품과 설비", ten:"The wet and DES line — chemistry and equipment",
+ lko:"판넬이 가장 여러 번 드나드는 방. 여기서 하는 일은 크게 둘 — 드라이필름을 붙이기 전에 구리 표면을 완벽하게 깨끗하고 거칠게 만드는 전처리, 그리고 노광이 끝난 뒤 현상·에칭·박리로 회로를 실제로 만들어내는 DES 라인.",
+ len:"The room a panel visits most often. Two jobs happen here: the pre-clean that gets the copper perfectly clean and slightly roughened before dry film goes on, and the DES line that afterwards develops, etches and strips the exposed film into an actual circuit.",
+ sections:[
+  {hko:"1. 왜 표면 전처리가 전부인가", hen:"1. Why the pre-clean decides everything",
+   pko:["드라이필름은 접착제로 구리에 붙는 것이 아니라, 눌러 붙인 뒤 미세한 요철에 물려서 버팁니다. 그래서 표면에 기름·지문·산화막·압연 잔사가 조금이라도 남아 있으면 그 자리에서 필름이 들뜨고, 현상액이 파고들어 회로가 끊깁니다.",
+    "반대로 너무 거칠게 깎아도 문제입니다. 미세 회로에서는 요철이 선폭 정밀도를 갉아먹습니다. 전처리의 목표는 '깨끗하고, 균일하게, 필요한 만큼만 거칠게'입니다.",
+    "즉 이 방에서 잘못되면 04번 노광에서 아무리 정확히 빛을 쬐어도 회로는 나오지 않습니다. 노광의 품질은 전처리가 이미 정해 놓습니다."],
+   pen:["Dry film does not glue itself to copper — it is pressed on and holds by keying into a microscopically rough surface. So any oil, fingerprint, oxide film or rolling residue left behind becomes a spot where the film lifts, developer creeps under it, and the circuit breaks.",
+    "Roughening too much is equally wrong: on fine lines the texture eats into line-width accuracy. The target is clean, uniform, and roughened just enough.",
+    "Which means a mistake in this room cannot be recovered in step 04. However precisely the exposure is done, the pre-clean has already set the ceiling on quality."]},
+  {hko:"2. 전처리 라인 — 약품과 순서", hen:"2. The pre-clean line, chemical by chemical",
+   table:{head:[{k:"조",e:"Stage"},{k:"약품 계열",e:"Chemistry"},{k:"하는 일",e:"What it does"},{k:"관리 항목",e:"Controlled by"}],nw:[0],rows:[
+    ["1",{k:"산성 탈지제",e:"Acid cleaner"},{k:"기름·지문·유기 오염 제거",e:"Strips oils, fingerprints and organic soil"},{k:"농도, 온도(약 40–50 °C), 체류 시간",e:"Concentration, temperature (about 40–50 °C), dwell"}],
+    ["2",{k:"수세",e:"Rinse"},{k:"탈지액 제거 — 다음 조 오염 방지",e:"Washes the cleaner off before the next tank"},{k:"다단 캐스케이드, 유량",e:"Cascade stages and flow rate"}],
+    ["3",{k:"마이크로에칭 (과황산나트륨 또는 과산화수소·황산)",e:"Micro-etch (sodium persulphate, or peroxide/sulphuric)"},{k:"구리 1–2 µm를 균일하게 깎아 신생면을 노출하고 미세 요철 형성",e:"Removes 1–2 µm of copper to expose fresh metal and create the micro-texture"},{k:"에칭량(µm), 구리 용존량, 온도",e:"Etch depth in µm, dissolved copper, temperature"}],
+    ["4",{k:"수세",e:"Rinse"},{k:"에칭액 제거",e:"Rinses the etchant away"},{k:"전도도 감시",e:"Conductivity monitoring"}],
+    ["5",{k:"산세 (묽은 황산)",e:"Acid dip (dilute sulphuric)"},{k:"표면 산화막 제거, 다음 공정까지 표면 활성 유지",e:"Removes the oxide film and keeps the surface active"},{k:"농도",e:"Concentration"}],
+    ["6",{k:"순수(DI) 수세",e:"DI rinse"},{k:"이온성 잔류물 완전 제거",e:"Takes out the last ionic residues"},{k:"비저항(보통 1 MΩ·cm 이상)",e:"Resistivity, typically above 1 MΩ·cm"}],
+    ["7",{k:"에어나이프 건조",e:"Air-knife dry"},{k:"물자국 없이 완전 건조 — 물 한 방울이 D/F 들뜸이 된다",e:"Bone dry with no water marks; one droplet becomes a lifted film"},{k:"풍량, 판넬 속도",e:"Air volume and panel speed"}],
+   ]},
+   nko:"전처리가 끝난 판넬은 표면이 활성 상태입니다. 대기 중에 두면 다시 산화되므로, 라인 출구에서 D/F 라미네이션까지의 허용 시간을 정해 두고 초과분은 재처리합니다.",
+   nen:"A panel leaving this line has an active surface that re-oxidises in air, so there is a maximum allowed time from the line exit to dry-film lamination; anything over it goes back through."},
+  {hko:"3. DES 라인 — 노광 뒤에 일어나는 일", hen:"3. The DES line, after exposure",
+   table:{head:[{k:"단계",e:"Stage"},{k:"약품",e:"Chemistry"},{k:"원리",e:"How it works"}],nw:[0],rows:[
+    [{k:"D — 현상 (Develop)",e:"D — Develop"},{k:"탄산나트륨(Na₂CO₃) 약 1% 희박 알칼리, 약 30 °C",e:"About 1% sodium carbonate, a weak alkali, around 30 °C"},{k:"빛을 받지 않아 경화되지 않은 D/F만 녹여 씻어낸다. 그 아래 구리가 드러난다",e:"Dissolves only the unexposed, uncured dry film, baring the copper beneath it"}],
+    [{k:"E — 에칭 (Etch)",e:"E — Etch"},{k:"내층은 산성 염화구리(CuCl₂), 외층은 알칼리 염화암모늄계",e:"Cupric chloride for inner layers; an alkaline ammoniacal etchant for outer layers"},{k:"드러난 구리를 용해. 남은 D/F 아래 구리는 보호되어 회로가 된다",e:"Dissolves the bared copper; what the film still covers survives as the circuit"}],
+    [{k:"S — 박리 (Strip)",e:"S — Strip"},{k:"수산화나트륨(NaOH) 약 3% 강알칼리",e:"About 3% sodium hydroxide, a strong alkali"},{k:"임무를 마친 D/F를 벗겨낸다. 구리 회로만 남는다",e:"Peels off the dry film now that its job is done, leaving bare copper circuitry"}],
+    [{k:"수세 · 건조",e:"Rinse and dry"},{k:"수세 → DI 수세 → 건조",e:"Rinse → DI rinse → dry"},{k:"AOI로 이송",e:"Then on to AOI"}],
+   ]},
+   nko:"내층에 산성 염화구리를 쓰는 이유는 측면 침식(언더컷)이 적어 선폭을 정밀하게 유지할 수 있기 때문이고, 외층에 알칼리계를 쓰는 이유는 도금된 주석 등 에칭 레지스트를 녹이지 않기 때문입니다.",
+   nen:"Cupric chloride is used on inner layers because it undercuts less and holds line width; the alkaline etchant is used outside because it does not attack the plated tin resist protecting the outer circuitry."},
+  {hko:"4. 설비는 어떻게 생겼는가", hen:"4. How the equipment is laid out",
+   pko:["두 라인 모두 같은 형태입니다 — 판넬이 롤러 컨베이어에 실려 수평으로 흐르고, 각 조를 지날 때 위아래 스프레이 노즐이 약품을 뿌립니다. 담가 두는 방식이 아니라 뿌리는 방식이라, 판넬 전면에 신선한 약품이 계속 닿습니다.",
+    "조와 조 사이에는 스퀴즈 롤러가 있어 약품이 다음 조로 넘어가는 것(carry-over)을 막습니다. 수세는 마지막 조에 깨끗한 물을 넣고 역방향으로 흘려 쓰는 캐스케이드 구조라, 물 사용량을 줄이면서도 마지막에 닿는 물이 가장 깨끗합니다.",
+    "각 조에는 순환 펌프·필터·열교환기·농도 보충 장치가 붙습니다. 실무에서 라인 상태를 좌우하는 것은 약품 자체보다 노즐 막힘, 필터 교환 주기, 스퀴즈 롤러 마모 같은 기계적 관리입니다."],
+   pen:["Both lines look the same: panels ride a roller conveyor horizontally while spray bars above and below flood them at each stage. Because it sprays rather than soaks, fresh chemistry keeps reaching the whole panel face.",
+    "Squeegee rollers between stages stop chemistry riding along into the next tank. The rinses are cascaded — clean water enters at the last stage and flows backwards — so the last water a panel meets is the cleanest, and consumption stays low.",
+    "Every stage carries a circulation pump, filter, heat exchanger and dosing unit. In practice what decides line performance is less the chemistry than the mechanical upkeep: blocked nozzles, filter change intervals, worn squeegee rollers."]},
+  {hko:"5. 대표 불량과 원인", hen:"5. What goes wrong here", rows:[
+   {k:"D/F 들뜸 — 전처리 후 잔류 수분·지문, 또는 라미네이션까지의 시간 초과",
+    e:"Lifted dry film — moisture or fingerprints after pre-clean, or too long a wait before lamination"},
+   {k:"현상 부족 — 현상액 농도 저하나 속도 과다. D/F 잔사가 남아 에칭이 안 된다",
+    e:"Under-development — weak developer or too fast a line; film residue stops the etch"},
+   {k:"현상 과다 — 경화된 D/F까지 손상되어 선폭이 가늘어진다",
+    e:"Over-development — even cured film is attacked and the lines come out thin"},
+   {k:"과에칭 — 언더컷으로 선폭 부족, 심하면 오픈",
+    e:"Over-etch — undercut narrows the line, and at worst opens it"},
+   {k:"부족에칭 — 구리가 남아 쇼트·잔동",
+    e:"Under-etch — copper left behind as shorts and residue"},
+   {k:"노즐 막힘 — 판넬 일부만 약품이 닿아 얼룩진 에칭 편차",
+    e:"Blocked nozzles — part of the panel is under-treated, giving patchy etch"},
+   {k:"박리 불량 — D/F가 완전히 벗겨지지 않아 이후 도금·솔더마스크 밀착 불량",
+    e:"Incomplete strip — leftover film ruins adhesion in plating and solder mask later"},
+  ]},
+ ]},
+
+"emma":{
+ btn:"전기검사 · 프로브 동작 원리 · ELECTRICAL TEST →",
+ eyebrow:"STEP 14 — ELECTRICAL TEST (EMMA / BBT)",
+ tko:"전기검사 — EMMA · BBT는 무엇을 어떻게 보는가", ten:"Electrical test — what EMMA and BBT actually measure",
+ lko:"AOI가 눈으로 볼 수 있는 것을 잡는다면, 전기검사는 눈으로 볼 수 없는 것을 잡는다. 층 안에 숨은 단선, 도금이 얇아 겨우 붙어 있는 홀, 육안으로 멀쩡한 미세 단락 — 전류를 흘려 보아야만 드러나는 결함들이다.",
+ len:"AOI catches what can be seen; electrical test catches what cannot. A break buried between layers, a hole barely held together by thin plating, a short too fine to see — these only show themselves when current is put through them.",
+ sections:[
+  {hko:"1. 프로브는 결함을 보지 않는다 — 저항을 잰다", hen:"1. A probe does not look for defects — it measures resistance",
+   pko:["전기검사의 원리는 놀라울 만큼 단순합니다. 설계 데이터에서 '어느 패드와 어느 패드가 같은 회로(네트)인가'를 뽑아낸 다음, 실물에서 그 두 점 사이의 저항을 재는 것이 전부입니다.",
+    "이어져 있어야 할 두 점의 저항이 높으면 오픈(단선), 떨어져 있어야 할 두 점의 저항이 낮으면 쇼트(단락). 판정은 이 두 가지밖에 없습니다.",
+    "그래서 전기검사는 '보이지 않는' 결함에 강합니다. 프레스로 덮여버린 내층의 끊김도, 도금이 얇게 붙은 스루홀도 저항으로는 반드시 드러납니다."],
+   pen:["The principle is startlingly simple. Take the design data, work out which pads belong to the same net, then measure the resistance between those points on the real board. That is the entire test.",
+    "Resistance high where two points should be joined is an open. Resistance low where they should be separate is a short. There are no other verdicts.",
+    "This is exactly why it catches what cannot be seen: a break buried under the press, or a through-hole holding on by a whisker of plating, both show up in a resistance reading."],
+   fig:'<figure class="dfig"><svg viewBox="0 0 640 210" role="img" aria-label="Continuity measures resistance along one net and expects it low; isolation measures between two nets and expects it high">\n<text x="150" y="20" text-anchor="middle" font-size="13" fill="currentColor" font-weight="600">연속성 · Continuity</text>\n<text x="490" y="20" text-anchor="middle" font-size="13" fill="currentColor" font-weight="600">절연 · Isolation</text>\n<line x1="320" y1="32" x2="320" y2="196" stroke="currentColor" stroke-width="1" opacity="0.25"/>\n<path d="M60 110 L110 110 L110 78 L200 78 L200 110 L245 110" fill="none" stroke="#C87F4A" stroke-width="3"/>\n<circle cx="60" cy="110" r="5" fill="none" stroke="#E0B44C" stroke-width="2"/>\n<circle cx="245" cy="110" r="5" fill="none" stroke="#E0B44C" stroke-width="2"/>\n<text x="152" y="66" text-anchor="middle" font-size="11" fill="currentColor">한 네트 · one net</text>\n<text x="152" y="140" text-anchor="middle" font-size="11.5" fill="currentColor">저항 낮음 = 정상</text>\n<text x="152" y="157" text-anchor="middle" font-size="11.5" fill="currentColor" opacity="0.75">low resistance = pass</text>\n<text x="152" y="182" text-anchor="middle" font-size="11.5" fill="#E0B44C">끊겨 있으면 오픈 · broken = OPEN</text>\n<path d="M380 92 L560 92" fill="none" stroke="#C87F4A" stroke-width="3"/>\n<path d="M380 126 L560 126" fill="none" stroke="#C87F4A" stroke-width="3"/>\n<circle cx="392" cy="92" r="5" fill="none" stroke="#E0B44C" stroke-width="2"/>\n<circle cx="392" cy="126" r="5" fill="none" stroke="#E0B44C" stroke-width="2"/>\n<text x="600" y="96" font-size="11" fill="currentColor">네트 A</text>\n<text x="600" y="130" font-size="11" fill="currentColor">네트 B</text>\n<text x="470" y="157" text-anchor="middle" font-size="11.5" fill="currentColor">저항 높음 = 정상 · high resistance = pass</text>\n<text x="470" y="182" text-anchor="middle" font-size="11.5" fill="#E0B44C">이어져 있으면 쇼트 · joined = SHORT</text>\n</svg><figcaption>프로브는 결함을 \'보는\' 것이 아니라 저항을 잰다. 이어져야 할 곳의 저항이 높으면 오픈, 떨어져야 할 곳의 저항이 낮으면 쇼트 — 판정은 이 두 가지뿐이다. · A probe does not see a defect, it measures resistance. High where it should be low is an open; low where it should be high is a short. Those two readings are the whole test.</figcaption></figure>' },
+  {hko:"2. 두 가지 방식 — 플라잉 프로브와 BBT 지그", hen:"2. Two ways to touch the board",
+   pko:["재는 원리가 같으니 남는 문제는 하나입니다 — 수천 개의 점을 어떻게 다 짚을 것인가. 여기에 답이 두 가지 있고, 둘의 차이는 정확도가 아니라 경제성입니다.",
+    "플라잉 프로브는 탐침 몇 개가 좌표를 따라 옮겨 다니며 한 점씩 짚습니다. 지그가 없으니 설계가 바뀌어도 데이터만 바꿔 바로 검사할 수 있지만, 네트가 많아질수록 시간이 비례해서 늘어납니다.",
+    "BBT 지그는 그 설계 전용으로 핀을 심어 만든 판을 한 번 눌러 모든 네트를 동시에 짚습니다. 지그 제작비가 먼저 들지만, 같은 설계를 수천 장 찍어낼 때는 장당 비용이 비교가 되지 않습니다."],
+   pen:["The measurement is the same either way, so only one problem is left: how to touch thousands of points. There are two answers, and what separates them is economics, not accuracy.",
+    "A flying probe moves a handful of probes from coordinate to coordinate, one point at a time. With no fixture, a design change means only new data — but the time grows with every net.",
+    "A BBT fixture is a plate of pins built for that one design; press it once and every net is contacted simultaneously. The fixture has to be paid for first, but across thousands of identical boards the per-board cost is not close."],
+   fig:'<figure class="dfig"><svg viewBox="0 0 640 250" role="img" aria-label="Flying probe moves a few probes from net to net; a bed-of-nails fixture contacts every net at once">\n<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>\n<text x="150" y="18" text-anchor="middle" font-size="13" fill="currentColor" font-weight="600">플라잉 프로브 · Flying probe</text>\n<text x="490" y="18" text-anchor="middle" font-size="13" fill="currentColor" font-weight="600">BBT 지그 · Bed-of-nails</text>\n<line x1="320" y1="30" x2="320" y2="235" stroke="currentColor" stroke-width="1" opacity="0.25"/>\n<rect x="40" y="150" width="220" height="46" fill="none" stroke="currentColor" stroke-width="1.5"/>\n<text x="150" y="212" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">기판 · board</text>\n<circle cx="80" cy="150" r="3.5" fill="currentColor"/><circle cx="130" cy="150" r="3.5" fill="currentColor"/>\n<circle cx="180" cy="150" r="3.5" fill="currentColor"/><circle cx="230" cy="150" r="3.5" fill="currentColor"/>\n<line x1="80" y1="60" x2="80" y2="144" stroke="#E0B44C" stroke-width="2.5" marker-end="url(#ar)"/>\n<line x1="180" y1="60" x2="180" y2="144" stroke="#E0B44C" stroke-width="2.5" marker-end="url(#ar)"/>\n<rect x="66" y="46" width="28" height="14" fill="#E0B44C"/><rect x="166" y="46" width="28" height="14" fill="#E0B44C"/>\n<path d="M100 53 L160 53" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>\n<text x="130" y="42" text-anchor="middle" font-size="11" fill="currentColor">이동 · moves</text>\n<text x="150" y="232" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">탐침 2–4개가 네트를 하나씩 · 2–4 probes, one net at a time</text>\n<rect x="380" y="150" width="220" height="46" fill="none" stroke="currentColor" stroke-width="1.5"/>\n<text x="490" y="212" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">기판 · board</text>\n<rect x="374" y="56" width="232" height="20" fill="none" stroke="#E0B44C" stroke-width="2"/>\n<text x="490" y="42" text-anchor="middle" font-size="11" fill="currentColor">전용 지그 · fixture (design-specific)</text>\n<line x1="394" y1="76" x2="394" y2="150" stroke="#E0B44C" stroke-width="2"/><line x1="416" y1="76" x2="416" y2="150" stroke="#E0B44C" stroke-width="2"/>\n<line x1="438" y1="76" x2="438" y2="150" stroke="#E0B44C" stroke-width="2"/><line x1="460" y1="76" x2="460" y2="150" stroke="#E0B44C" stroke-width="2"/>\n<line x1="482" y1="76" x2="482" y2="150" stroke="#E0B44C" stroke-width="2"/><line x1="504" y1="76" x2="504" y2="150" stroke="#E0B44C" stroke-width="2"/>\n<line x1="526" y1="76" x2="526" y2="150" stroke="#E0B44C" stroke-width="2"/><line x1="548" y1="76" x2="548" y2="150" stroke="#E0B44C" stroke-width="2"/>\n<line x1="570" y1="76" x2="570" y2="150" stroke="#E0B44C" stroke-width="2"/><line x1="592" y1="76" x2="592" y2="150" stroke="#E0B44C" stroke-width="2"/>\n<text x="490" y="232" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">모든 네트를 한 번에 · every net at once</text>\n</svg><figcaption>같은 검사를 두 가지 방법으로. 플라잉 프로브는 지그가 없어 설계가 바뀌어도 바로 검사할 수 있지만 네트를 하나씩 찾아다녀 느리고, BBT는 그 설계 전용 지그를 만들어야 하지만 한 번 누르면 끝난다. · The same test, two ways. Flying probe needs no fixture so a new design can be tested immediately, but it visits nets one at a time; the bed-of-nails needs a fixture built for that design, then tests it in one press.</figcaption></figure>',
+   table:{head:[{k:"항목",e:"Aspect"},{k:"플라잉 프로브",e:"Flying probe"},{k:"BBT 전용 지그",e:"Bed-of-nails fixture"}],nw:[0],rows:[
+    [{k:"접촉 방식",e:"Contact"},{k:"탐침 2–4개(많게는 8개)가 이동하며 한 점씩",e:"Two to four probes (sometimes eight) moving point to point"},{k:"수천 개의 핀이 모든 네트를 동시에",e:"Thousands of pins touching every net at once"}],
+    [{k:"준비",e:"Setup"},{k:"데이터만 넣으면 즉시 검사 가능",e:"Load the data and test immediately"},{k:"그 설계 전용 지그를 제작해야 함",e:"A fixture must be built for that design"}],
+    [{k:"속도",e:"Speed"},{k:"느림 — 네트 수에 비례해 시간이 늘어난다",e:"Slow: time scales with the number of nets"},{k:"매우 빠름 — 한 번 누르면 끝",e:"Very fast: one press and it is done"}],
+    [{k:"비용 구조",e:"Cost shape"},{k:"초기 비용 없음, 장당 시간이 비용",e:"No setup cost; the cost is time per board"},{k:"지그 제작비가 선투자, 이후 장당 비용은 낮음",e:"Fixture cost up front, then very low per board"}],
+    [{k:"적합",e:"Suits"},{k:"시제품, 소량, 설계 변경이 잦은 제품",e:"Prototypes, small runs, designs that keep changing"},{k:"양산 — 같은 설계를 대량으로",e:"Volume production of one settled design"}],
+    [{k:"미세 피치",e:"Fine pitch"},{k:"유리 — 핀을 물리적으로 심을 필요가 없다",e:"Better: nothing has to be physically planted"},{k:"핀 간격의 물리적 한계가 있다",e:"Limited by how close pins can physically sit"}],
+   ]}},
+  {hko:"3. 실제 검사에서 더 보는 것들", hen:"3. What a real tester checks beyond pass/fail", rows:[
+   {k:"저항 임계값 — 단순히 '이어짐'이 아니라 규정 저항 이하인지. 도금이 얇으면 이어져 있어도 저항이 높게 나온다",
+    e:"Resistance threshold — not merely 'connected' but connected below a set resistance; thin plating still conducts, just badly"},
+   {k:"절연 저항 — 보통 수십~수백 V를 걸어 측정. 낮은 전압에서는 멀쩡해 보이는 오염·미세 브리지가 드러난다",
+    e:"Insulation resistance — measured at tens or hundreds of volts, which exposes contamination and fine bridges that look fine at low voltage"},
+   {k:"고전압 내압(HiPot) — 고객 사양에 따라 층간·네트간 절연 파괴 시험을 추가",
+    e:"HiPot — where the customer spec calls for it, a dielectric-withstand test between layers and nets"},
+   {k:"4선식 측정 — 저저항 네트는 프로브 접촉저항이 오차가 되므로 켈빈(4-wire) 방식으로 측정",
+    e:"Four-wire (Kelvin) measurement — on low-resistance nets the probe contact itself would dominate the reading"},
+   {k:"프로브 마크 — 탐침이 패드에 남기는 자국. 깊이가 규격을 넘으면 그 자체가 불량이 된다",
+    e:"Probe marks — the dents probes leave on pads; past a depth limit the mark is itself a defect"},
+  ]},
+  {hko:"4. 왜 마지막이 아니라 여기인가", hen:"4. Why it sits here in the flow",
+   pko:["본 공장에서 전기검사(14번)는 표면처리를 마치고 돌아온 뒤, 라우팅·V-cut(14B)으로 보드를 잘라내기 전에 이루어집니다.",
+    "판넬 상태에서 검사하면 여러 보드를 한 번에 다룰 수 있고 정합도 안정적입니다. 또한 불량 보드를 잘라내기 전에 표시해 두면, 이후 최종검사·포장에서 불량품이 섞여 나가는 것을 막을 수 있습니다.",
+    "다만 라우팅과 V-cut 자체가 회로에 손상을 줄 수도 있으므로, 고객 사양에 따라 절단 후 재검사를 요구하는 경우도 있습니다."],
+   pen:["Here, electrical test (step 14) happens after the panels come back from surface finish and before routing and V-cut (14B) separate the boards.",
+    "Testing while still in panel form means many boards are handled at once and registration stays predictable. Marking the failures before separation is also what keeps a bad board from slipping through final inspection and packing.",
+    "That said, routing and V-cut can themselves damage a circuit, so some customer specs require a re-test after separation."],
+   nko:"본 페이지의 그림은 사진이 아니라 원리를 나타낸 개념도입니다. 실제 설비의 탐침 수·배치·측정 조건은 장비 사양과 고객 요구에 따라 다릅니다.",
+   nen:"The figures on this page are schematics of the principle, not photographs. Real machines differ in probe count, layout and test conditions according to the equipment and the customer's spec."},
+ ]},
+
+"ghz":{
+ btn:"주파수와 기판 · GHz, Dk, Df EXPLAINED →",
+ eyebrow:"REFERENCE — FREQUENCY, Dk AND Df",
+ tko:"GHz · Dk · Df — 데이터시트의 숫자가 공장에서 뜻하는 것", ten:"GHz, Dk and Df — what the datasheet numbers mean on the factory floor",
+ lko:"완전히 처음 보는 사람을 기준으로 썼습니다. 주파수가 무엇인지부터 시작해서, 그 숫자가 왜 자재 가격을 열 배로 올리고 공정 조건을 바꾸는지까지 이어집니다.",
+ len:"Written for someone seeing this for the first time. It starts from what frequency even is, and ends at why that number multiplies the material price tenfold and changes how the panel is processed.",
+ sections:[
+  {hko:"1. 헤르츠와 GHz — 그냥 '초당 몇 번'", hen:"1. Hertz and GHz — simply 'how many times a second'",
+   pko:["헤르츠(Hz)는 어떤 것이 1초에 몇 번 반복되는가를 세는 단위입니다. 1 Hz는 1초에 한 번, 1 kHz는 천 번, 1 MHz는 백만 번, 1 GHz는 10억 번입니다.",
+    "전자 회로에서 반복되는 것은 전압입니다. 신호가 높았다 낮았다를 초당 10억 번 반복하면 1 GHz입니다. 디지털 신호에서 자주 보는 Gbps(초당 기가비트)는 초당 몇 비트를 보내는가이며, 대략 그 절반 정도의 주파수 성분을 갖는다고 보면 감이 맞습니다.",
+    "여기서 중요한 직관 하나. 주파수가 높다는 것은 곧 '변화가 빠르다'는 뜻이고, 변화가 빠를수록 전기는 우리가 학교에서 배운 '선을 따라 흐르는 물'처럼 얌전히 굴지 않습니다. 배선 주변의 절연물과 구리 표면이 신호에 개입하기 시작합니다. 기판 자재가 문제가 되는 지점이 정확히 여기입니다."],
+   pen:["A hertz (Hz) counts how many times something repeats per second. 1 Hz is once a second, 1 kHz a thousand times, 1 MHz a million, 1 GHz a billion.",
+    "In a circuit what repeats is voltage. A signal swinging high and low a billion times a second is 1 GHz. Gbps — gigabits per second — counts bits rather than cycles, and as a rough feel its frequency content sits around half that number.",
+    "One intuition matters more than any formula: high frequency means fast change, and the faster electricity changes, the less it behaves like water flowing obediently down a pipe. The insulation around the trace and the surface of the copper start taking part. That is precisely where the laminate stops being a passive slab and becomes a component."]},
+  {hko:"2. 배선 한 가닥의 단면에서 벌어지는 일", hen:"2. What happens in one cross-section of a trace",
+   fig:"<figure class=\"dfig\"><svg viewBox=\"0 0 700 300\" role=\"img\" aria-label=\"Cross-section of a trace over dielectric and ground, showing where Dk, Df and copper roughness each act on the signal\">\n<defs><marker id=\"ar2\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"currentColor\"/></marker></defs>\n<text x=\"30\" y=\"32\" font-size=\"13\" fill=\"currentColor\" font-weight=\"600\">\uc2e0\ud638\uac00 \uc9c0\ub098\uac00\ub294 \uc790\ub9ac\uc5d0\uc11c \uc138 \uac00\uc9c0\uac00 \ub3d9\uc2dc\uc5d0 \uc77c\uc5b4\ub09c\ub2e4</text>\n<text x=\"30\" y=\"50\" font-size=\"11.5\" fill=\"currentColor\" opacity=\"0.75\">Three things happen at once where the signal travels</text>\n<text x=\"320\" y=\"76\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">\uc120\ud3ed w</text>\n<line x1=\"270\" y1=\"84\" x2=\"370\" y2=\"84\" stroke=\"currentColor\" stroke-width=\"1\" marker-start=\"url(#ar2)\" marker-end=\"url(#ar2)\"/>\n<rect x=\"270\" y=\"96\" width=\"100\" height=\"20\" fill=\"#C87F4A\"/>\n<text x=\"384\" y=\"111\" font-size=\"11.5\" fill=\"currentColor\">\ubc30\uc120 \u00b7 trace</text>\n<path d=\"M270 116 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0\" fill=\"none\" stroke=\"#E0B44C\" stroke-width=\"2\"/>\n<text x=\"30\" y=\"92\" font-size=\"11.5\" fill=\"#E0B44C\">\ub3d9\ubc15 \uac70\uce60\uae30</text>\n<text x=\"30\" y=\"108\" font-size=\"10.5\" fill=\"currentColor\" opacity=\"0.8\">copper roughness</text>\n<line x1=\"132\" y1=\"103\" x2=\"262\" y2=\"117\" stroke=\"#E0B44C\" stroke-width=\"1.2\" marker-end=\"url(#ar2)\"/>\n<rect x=\"130\" y=\"116\" width=\"440\" height=\"84\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\n<text x=\"350\" y=\"146\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">\uc720\uc804\uccb4 (\uc218\uc9c0 + \uc720\ub9ac) \u00b7 dielectric</text>\n<text x=\"145\" y=\"179\" font-size=\"10.5\" fill=\"#E0B44C\">Df = \uc2e0\ud638\ub97c \uc5f4\ub85c \ud761\uc218</text>\n<path d=\"M300 166 l13 11 l-13 11\" fill=\"none\" stroke=\"#E0B44C\" stroke-width=\"2\"/>\n<path d=\"M326 166 l13 11 l-13 11\" fill=\"none\" stroke=\"#E0B44C\" stroke-width=\"2\" opacity=\"0.55\"/>\n<path d=\"M352 166 l13 11 l-13 11\" fill=\"none\" stroke=\"#E0B44C\" stroke-width=\"2\" opacity=\"0.28\"/>\n<rect x=\"130\" y=\"200\" width=\"440\" height=\"14\" fill=\"#C87F4A\"/>\n<text x=\"350\" y=\"236\" text-anchor=\"middle\" font-size=\"11.5\" fill=\"currentColor\" opacity=\"0.8\">\uadf8\ub77c\uc6b4\ub4dc \uce35 \u00b7 ground plane</text>\n<line x1=\"596\" y1=\"116\" x2=\"596\" y2=\"200\" stroke=\"currentColor\" stroke-width=\"1\" marker-start=\"url(#ar2)\" marker-end=\"url(#ar2)\"/>\n<text x=\"608\" y=\"152\" font-size=\"11\" fill=\"currentColor\">\ub450\uaed8 h</text>\n<text x=\"608\" y=\"170\" font-size=\"10.5\" fill=\"currentColor\" opacity=\"0.7\">w/h + Dk</text>\n<text x=\"608\" y=\"185\" font-size=\"10.5\" fill=\"currentColor\" opacity=\"0.7\">= \uc784\ud53c\ub358\uc2a4</text>\n<text x=\"30\" y=\"266\" font-size=\"10.5\" fill=\"currentColor\" opacity=\"0.7\">\uc2e0\ud638\ub294 \uc774 \ub2e8\uba74\uc5d0 \uc218\uc9c1\uc73c\ub85c \uc9c4\ud589 \u00b7 the signal runs perpendicular to this section</text>\n</svg><figcaption>\uc774 \ub2e8\uba74 \ud558\ub098\uc5d0 \ub370\uc774\ud130\uc2dc\ud2b8\uc758 \uc22b\uc790\uac00 \uc804\ubd80 \ub4e4\uc5b4 \uc788\ub2e4. Dk\ub294 \uc120\ud3ed w\u00b7\ub450\uaed8 h\uc640 \ud568\uaed8 \uc784\ud53c\ub358\uc2a4\ub97c \uc815\ud558\uace0, Df\ub294 \uc720\uc804\uccb4\uac00 \uc2e0\ud638\ub97c \uc5f4\ub85c \uc5bc\ub9c8\ub098 \ube68\uc544\uba39\ub294\uc9c0\ub97c, \ubc30\uc120 \uc544\ub798\ucabd \ub3d9\ubc15\uc758 \uac70\uce60\uae30\ub294 \uace0\uc8fc\ud30c\uc5d0\uc11c \uc804\ub958\uac00 \ud0c0\uace0 \uac00\uc57c \ud558\ub294 \ud45c\uba74\uc758 \uae38\uc774\ub97c \uc815\ud55c\ub2e4. \u00b7 One cross-section holds every number on the datasheet. Dk together with w and h sets the impedance, Df says how much of the signal the dielectric turns into heat, and the roughness on the underside of the trace sets how long a path the current must take once frequency pushes it to the surface.</figcaption></figure>" },
+  {hko:"3. Dk — 신호를 얼마나 느리게 하는가", hen:"3. Dk — how much the material slows the signal",
+   pko:["Dk(유전율, εr)는 그 자재 안에서 전기 신호가 진공에서보다 얼마나 느리게 가는지를 나타냅니다. FR-4는 약 4.4, RF용 PTFE는 약 2.2입니다.",
+    "실무에서 Dk가 중요한 이유는 두 가지입니다. 첫째, 임피던스. 고속 신호는 배선 전체가 정해진 임피던스(대개 50 Ω)를 유지해야 반사 없이 갑니다. 그 임피던스는 선폭 w, 유전체 두께 h, 그리고 Dk 세 가지로 결정됩니다. 그래서 설계가 지정한 스택업의 두께를 현장에서 임의로 바꾸면 임피던스가 틀어집니다 — 06번 레이업에서 프리프레그를 마음대로 대체하면 안 되는 이유가 이것입니다.",
+    "둘째, 크기. 안테나와 필터의 물리적 크기는 자재 안에서의 파장에 비례하므로, Dk가 높은 자재를 쓰면 같은 주파수의 안테나를 더 작게 만들 수 있습니다. 자재 목록에 Dk 10.2짜리(RO3010, RT6010)가 있는 이유가 이것 — 성능이 아니라 크기를 위해 일부러 고르는 것입니다."],
+   pen:["Dk (the dielectric constant, εr) says how much slower a signal travels inside that material than in vacuum. FR-4 is about 4.4; RF-grade PTFE about 2.2.",
+    "It matters for two practical reasons. First, impedance. A fast signal needs the whole trace held at one impedance — usually 50 Ω — or it reflects. That impedance comes from three things: trace width w, dielectric thickness h, and Dk. Change the stack-up thickness on the floor and the impedance moves. This is exactly why a prepreg substitution at lay-up is never a free choice.",
+    "Second, size. Antennas and filters scale with the wavelength inside the material, so a high-Dk laminate makes the same antenna physically smaller. That is why Dk 10.2 materials (RO3010, RT6010) exist on the approved list — chosen deliberately for size, not performance."]},
+  {hko:"4. Df — 자재가 신호를 먹는 비율", hen:"4. Df — the fraction the material eats",
+   pko:["Df(유전손실, tanδ)는 신호 에너지 중 자재가 열로 바꿔 없애버리는 비율입니다. 이 숫자가 자재 가격을 가릅니다.",
+    "대략적인 감각: 0.020이면 평범한 FR-4, 0.010이면 저손실, 0.003이면 초저손실, 0.001이면 PTFE급입니다. 한 단계 내려갈 때마다 가격은 대략 두 배가 됩니다.",
+    "왜 이렇게까지 하는가. 손실은 주파수가 오를수록, 그리고 배선이 길수록 누적됩니다. 짧은 배선이라면 FR-4로도 10 GHz를 보낼 수 있지만, 서버 백플레인처럼 30 cm를 가야 하는 신호는 도착했을 때 판독이 불가능할 만큼 뭉개집니다. 그래서 '이 자재가 몇 GHz까지 되는가'라는 질문에는 정답이 없고, 항상 '얼마나 멀리 보낼 것인가'와 함께 물어야 합니다."],
+   pen:["Df (the dissipation factor, tanδ) is the fraction of signal energy the material converts into heat. This is the number that sets the price.",
+    "A rough feel: 0.020 is ordinary FR-4, 0.010 is low loss, 0.003 very low loss, 0.001 is PTFE class. Every step down roughly doubles the cost.",
+    "Why anyone pays that: loss accumulates with frequency and with distance. Over a short trace FR-4 will carry 10 GHz perfectly well; over the 30 cm of a server backplane the same signal arrives as mush. So 'how many GHz is this material good for' has no answer on its own — it only means something alongside 'and how far does it have to go'."]},
+  {hko:"5. 표피효과 — 동박 거칠기가 돈이 되는 이유", hen:"5. The skin effect, or why smooth copper costs money",
+   fig:'<figure class="dfig"><svg viewBox="0 0 600 190" role="img" aria-label="As frequency rises current stops filling the conductor and crowds into a thinner and thinner surface skin">\n<text x="300" y="20" text-anchor="middle" font-size="12" fill="currentColor">같은 배선, 주파수만 다를 때 전류가 흐르는 단면 · the same trace, current cross-section at three frequencies</text>\n<rect x="60" y="60" width="120" height="52" fill="#C87F4A" opacity="0.85"/>\n<rect x="60" y="60" width="120" height="52" fill="none" stroke="currentColor" stroke-width="1.5"/>\n<text x="120" y="136" text-anchor="middle" font-size="12" fill="currentColor">DC · 저주파</text>\n<text x="120" y="153" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">전체 단면 사용</text>\n<text x="120" y="170" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">whole section carries</text>\n<rect x="240" y="60" width="120" height="52" fill="none" stroke="currentColor" stroke-width="1.5"/>\n<rect x="240" y="60" width="120" height="11" fill="#C87F4A" opacity="0.85"/>\n<rect x="240" y="101" width="120" height="11" fill="#C87F4A" opacity="0.85"/>\n<text x="300" y="136" text-anchor="middle" font-size="12" fill="currentColor">1 GHz</text>\n<text x="300" y="153" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">표피 약 2 µm</text>\n<text x="300" y="170" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">skin about 2 µm</text>\n<rect x="420" y="60" width="120" height="52" fill="none" stroke="currentColor" stroke-width="1.5"/>\n<rect x="420" y="60" width="120" height="4.5" fill="#E0B44C"/>\n<rect x="420" y="107.5" width="120" height="4.5" fill="#E0B44C"/>\n<text x="480" y="136" text-anchor="middle" font-size="12" fill="#E0B44C">10 GHz</text>\n<text x="480" y="153" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">표피 약 0.7 µm</text>\n<text x="480" y="170" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">skin about 0.7 µm</text>\n</svg><figcaption>표피효과(skin effect). 10 GHz에서 전류가 흐르는 층은 1 µm도 되지 않는다 — 동박 표면의 요철이 그보다 크면, 전류는 그 굴곡을 전부 돌아가야 한다. 매끄러운 동박(VLP·HVLP)이 비싼 이유가 이것이다. · The skin effect. At 10 GHz the conducting layer is under a micron thick, so if the copper\'s surface texture is bigger than that, the current has to climb over every bump. That is what you are buying with VLP and HVLP foil.</figcaption></figure>',
+   pko:"이것이 자재 목록의 접미사(HTE · RTF · VLP · HVLP)가 존재하는 이유입니다. 같은 수지라도 어떤 동박을 쓰느냐에 따라 손실이 달라지고, 매끄러운 동박일수록 비싸며 접착을 유지하기가 까다로워집니다 — 그래서 05번 산화처리의 관리가 고주파 제품에서 특히 중요해집니다.",
+   pen:"This is why the suffixes on the material list (HTE, RTF, VLP, HVLP) exist at all. The same resin with a different foil gives different loss; smoother foil costs more and is harder to keep bonded — which is exactly why oxide control in step 05 matters most on high-frequency work."},
+  {hko:"6. 그래서 공장에서 무엇이 달라지는가", hen:"6. What actually changes on the floor",
+   table:{head:[{k:"공정",e:"Step"},{k:"저주파 일반 기판",e:"Ordinary low-frequency board"},{k:"고주파 · 고속 기판",e:"High-frequency / high-speed board"}],nw:[0],rows:[
+    [{k:"02 재단 · 자재",e:"02 Material"},{k:"표준 FR-4, 재고 자재",e:"Standard FR-4, off the shelf"},{k:"지정 자재만 사용 — 대체 불가, 납기가 길다",e:"The specified laminate only; no substitutions, long lead times"}],
+    [{k:"06 레이업",e:"06 Lay-up"},{k:"두께만 맞으면 됨",e:"Thickness is the requirement"},{k:"프리프레그 종류·매수까지 설계 지정 — 임피던스가 걸려 있다",e:"Prepreg type and ply count are specified; impedance depends on them"}],
+    [{k:"05 산화처리",e:"05 Oxide"},{k:"표준 조건",e:"Standard conditions"},{k:"매끄러운 동박은 접착이 어려워 조건 관리가 엄격",e:"Smooth foil bonds less easily, so the window is tighter"}],
+    [{k:"03·11 에칭",e:"03/11 Etch"},{k:"선폭 공차 여유 있음",e:"Comfortable line-width tolerance"},{k:"선폭이 곧 임피던스 — 공차가 훨씬 좁다",e:"Line width *is* impedance; the tolerance is far tighter"}],
+    [{k:"08 드릴",e:"08 Drill"},{k:"표준 조건",e:"Standard parameters"},{k:"PTFE·세라믹계는 전용 조건과 플라즈마 처리 필요",e:"PTFE and ceramic-filled grades need special parameters and plasma prep"}],
+    [{k:"검사",e:"Test"},{k:"전기검사로 충분",e:"Electrical test is enough"},{k:"임피던스 쿠폰 측정(TDR)이 추가되는 경우가 많다",e:"An impedance coupon measured by TDR is commonly added"}],
+   ]},
+   nko:"정리하면 — GHz는 '얼마나 빨리 변하는가', Dk는 '얼마나 느리게 가는가와 임피던스', Df는 '가는 동안 얼마나 사라지는가'입니다. 데이터시트의 Dk·Df 값은 보통 10 GHz 부근의 대표값이며, 실제 값은 두께·유리직물·동박에 따라 달라지므로 구매 사양 기준의 최신 데이터시트를 확인해야 합니다.",
+   nen:"To summarise: GHz is how fast it changes, Dk is how slowly it travels and what the impedance will be, Df is how much disappears on the way. Published Dk and Df figures are typically quoted near 10 GHz, and the real values shift with thickness, glass style and copper — so always work from the datasheet for what you are actually buying."},
+ ]},
+
 "glossary":{
  glossary:true,
  eyebrow:"GLOSSARY — 용어집",
@@ -887,10 +1106,11 @@ var DETAILS={
 
 /* Extra detail pages linked from a step, on top of its own page.
    Add a page id here to give that step another button. */
-var STEPPAGES={"05":["defects","oxide"],"06":["layup"],"07":["layup"],"10":["plating"],"12":["defects"]};
+var STEPPAGES={"03":["wetline"],"04":["wetline"],"05":["defects","oxide"],"06":["layup"],"07":["layup"],
+  "10":["plating"],"11":["wetline"],"12":["defects"],"14":["emma"]};
 
 var FLOOR={office3:0,pack3:0,psr3:0,aoi2:1,exp2:1,wet2:1,dsm2:1,plt2:1,wh1:2,lay1:2,prs1:2,trm1:2,drl1:2,emma1:2,out:3};
-var idx=0, timer=null, map=document.getElementById('map'), svg=null;
+var idx=0, timer=null, map=document.getElementById('map'), svg=null, blinkT=null;
 
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 
@@ -985,6 +1205,7 @@ function openDetail(n,term){
       h+='<div class="cols dpara"><div class="ko">'+pk.map(function(x){return '<p>'+mk(x)+'</p>'}).join('')
        +'</div><div class="en">'+pe.map(function(x){return '<p>'+mk(x)+'</p>'}).join('')+'</div></div>';
     }
+    if(sec.fig) h+=sec.fig;
     if(sec.rows){
       h+='<div class="cols"><ul class="ko">'+sec.rows.map(function(r){return '<li>'+mk(r.k)+'</li>'}).join('')+'</ul>'
        +'<ul class="en">'+sec.rows.map(function(r){return '<li>'+mk(r.e)+'</li>'}).join('')+'</ul></div>';
@@ -1134,6 +1355,12 @@ function drawTrace(){
     }
   }
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nxtEl=map.querySelector('[data-room="'+nxt+'"]');
+  if(nxtEl&&!reduce){
+    nxtEl.classList.add('nextup');
+    clearTimeout(blinkT);
+    blinkT=setTimeout(function(){nxtEl.classList.remove('nextup')},1500);
+  }
   var len=p.getTotalLength();
   if(!reduce){
     p.style.strokeDasharray=len; p.style.strokeDashoffset=len;
@@ -1164,7 +1391,8 @@ function drawTrace(){
 function render(){
   var s=STEPS[idx];
   var rooms=document.querySelectorAll('.rm');
-  for(var i=0;i<rooms.length;i++){rooms[i].classList.remove('live','seen')}
+  clearTimeout(blinkT);
+  for(var i=0;i<rooms.length;i++){rooms[i].classList.remove('live','seen','nextup')}
   for(var j=0;j<idx;j++){
     for(var m=0;m<STEPS[j].room.length;m++){
       var el=map.querySelector('[data-room="'+STEPS[j].room[m]+'"]');
