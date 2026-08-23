@@ -117,6 +117,10 @@ body.detail-open{overflow:hidden}
 #detail .dwrap{max-width:1080px;margin:0 auto;padding:32px 24px 72px}
 .back{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--silk);border:1px solid var(--edge);border-radius:3px;padding:8px 13px;text-decoration:none;margin-bottom:26px;transition:border-color .15s,color .15s}
 .back:hover{border-color:var(--copper);color:var(--copper)}
+.dhead{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:26px}
+.dhead .back{margin-bottom:0}
+.dprint{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--gold);background:none;border:1px solid var(--edge);border-radius:3px;padding:8px 13px;cursor:pointer;transition:border-color .15s,color .15s}
+.dprint:hover{border-color:var(--gold);color:var(--gold)}
 .dsec{margin-bottom:28px}
 .dsec h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--copper);margin:0 0 10px;text-transform:uppercase;border-bottom:1px solid var(--edge);padding-bottom:8px}
 .dpara p{font-size:13.5px;line-height:1.6;margin:0 0 8px}
@@ -142,8 +146,8 @@ body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
 
 #totop{position:fixed;right:18px;bottom:18px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 #totop.show{opacity:1;pointer-events:auto}
-#printnote{display:none;font-family:var(--mono);font-size:11px;color:var(--gold);border:1px dashed var(--gold);border-radius:3px;padding:8px 12px;margin:0 0 18px;line-height:1.5}
-#printnote.show{display:block}
+#printnote,#dprintnote{display:none;font-family:var(--mono);font-size:11px;color:var(--gold);border:1px dashed var(--gold);border-radius:3px;padding:8px 12px;margin:0 0 18px;line-height:1.5}
+#printnote.show,#dprintnote.show{display:block}
 
 @media (max-width:700px){
   .wrap{padding:22px 14px 56px}
@@ -159,7 +163,7 @@ body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
   @page{size:A4 portrait;margin:13mm}
   body{background:#fff;color:#111;font-size:9.2pt}
   .wrap{max-width:none;padding:0}
-  .bar,.railwrap,.foot,svg.trace,#totop,#printnote,.rm .dtl,#detail,.more{display:none!important}
+  .bar,.railwrap,.foot,svg.trace,#totop,#printnote,#dprintnote,.rm .dtl,#detail,.more{display:none!important}
   .g{border-bottom:none;color:inherit}
   .eyebrow{color:#666}
   h1{font-size:16pt;color:#111}
@@ -179,12 +183,41 @@ body.en .dtbl .ko,body.en .dpara .ko,body.en .dnote .ko{display:none}
   .st.live .h4,.h4{color:#111}
   .h5,.cols .en li,.loc{color:#555}
   .cols{grid-template-columns:1fr 1fr!important}
+  body.ko.detail-open .cols,body.en.detail-open .cols{grid-template-columns:1fr!important}
   .cols li{font-size:8pt;line-height:1.35}
   .dfig{background:none;border:.5pt solid #999}
   .dfig svg{color:#111}
   .mv{color:#666}
   .mv::before{background:#666}
-  body.ko .en,body.en .ko{display:revert}
+  body:not(.detail-open).ko .en,body:not(.detail-open).en .ko{display:revert}
+
+  /* Printing a detail page prints that page alone, on the same A4 sheet setup. */
+  body.detail-open{overflow:visible!important}
+  body.detail-open .wrap>*:not(#detail){display:none!important}
+  body.detail-open #detail{display:block!important;position:static;overflow:visible;background:#fff;z-index:auto}
+  body.detail-open .eyebrow{color:#666}
+  #detail .dwrap{max-width:none;padding:0}
+  #detail .dhead,#detail .back{display:none!important}
+  #detail h1{font-size:15pt}
+  #detail .lede{color:#555}
+  #detail .dsec h3{color:#111;border-bottom:.5pt solid #999;page-break-after:avoid}
+  #detail .dpara p,#detail .cols li{font-size:8.6pt;line-height:1.4}
+  #detail .dpara .en p,#detail .cols .en li{color:#555}
+  #detail .dtbl{border:.5pt solid #999;overflow:visible}
+  #detail .dtbl table{font-size:8pt}
+  #detail .dtbl th{color:#111;background:#f4f4f0;border-bottom:.5pt solid #999}
+  #detail .dtbl th .en{color:#555}
+  #detail .dtbl td{color:#111;border-bottom:.5pt solid #ccc}
+  #detail .dtbl td .en{color:#555;font-size:7.6pt}
+  #detail .dtbl tbody tr{page-break-inside:avoid}
+  #detail .dtbl tbody tr:nth-child(even){background:#f7f7f4}
+  #detail .dnote{color:#555;font-size:8pt}
+  #detail .dfig{page-break-inside:avoid}
+  #detail .gent{border-bottom:.5pt solid #ccc;page-break-inside:avoid}
+  #detail .gent dt{color:#111}
+  #detail .gent dt .ge{color:#555}
+  #detail .gent dd{font-size:8.6pt}
+  #detail .gent dd .en{color:#555}
 }
 </style>
 </head>
@@ -1191,7 +1224,9 @@ function openDetail(n,term){
   var back=D.glossary
    ?'<a class="back" href="#" onclick="if(history.length>1){history.back();return false}">← 돌아가기 BACK</a>'
    :'<a class="back" href="#">← 돌아가기 BACK</a>';
-  var h='<div class="dwrap">'+back
+  var h='<div class="dwrap"><div class="dhead">'+back
+   +'<button type="button" class="dprint" onclick="printDetail()">\u2399 \uc774 \ud398\uc774\uc9c0 \uc778\uc1c4 PRINT PAGE</button></div>'
+   +'<p id="dprintnote">\uc774 \ubbf8\ub9ac\ubcf4\uae30 \ud654\uba74\uc5d0\uc11c\ub294 \uc778\uc1c4\uac00 \ucc28\ub2e8\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4 \u2014 index.html \ud30c\uc77c\uc744 \ube0c\ub77c\uc6b0\uc800\uc5d0\uc11c \uc9c1\uc811 \uc5f4\uc5b4 \uc778\uc1c4\ud558\uc138\uc694. \u00b7 Printing is blocked in this embedded preview \u2014 open index.html directly in a browser to print.</p>'
    +'<p class="eyebrow">'+esc(D.eyebrow||('STEP '+n+' — DETAIL'))+'</p>'
    +'<h1><span class="ko">'+esc(D.tko)+'</span> <span class="alt en">'+esc(D.ten)+'</span></h1>';
   if(D.lko) h+='<p class="lede"><span class="ko">'+esc(D.lko)+'</span> <span class="en">'+esc(D.len)+'</span></p>';
@@ -1435,20 +1470,24 @@ buildList();
 document.getElementById('prev').onclick=function(){setPlay(false);go(idx-1)};
 document.getElementById('next').onclick=function(){setPlay(false);go(idx+1)};
 document.getElementById('play').onclick=function(){setPlay(this.getAttribute('aria-pressed')!=='true')};
-document.getElementById('print').onclick=function(){
+/* Print whatever is on screen. Some embedded previews block window.print()
+   silently, so if no beforeprint fires we say so instead of doing nothing. */
+function printWithNote(noteId){
   var fired=false;
   var h=function(){fired=true};
   window.addEventListener('beforeprint',h);
   window.print();
   setTimeout(function(){
     window.removeEventListener('beforeprint',h);
-    if(!fired){
-      var note=document.getElementById('printnote');
-      note.classList.add('show');
-      setTimeout(function(){note.classList.remove('show')},8000);
-    }
+    if(fired) return;
+    var note=document.getElementById(noteId);
+    if(!note) return;
+    note.classList.add('show');
+    setTimeout(function(){note.classList.remove('show')},8000);
   },400);
-};
+}
+function printDetail(){printWithNote('dprintnote')}
+document.getElementById('print').onclick=function(){printWithNote('printnote')};
 
 function nextStepForRoom(id){
   for(var k=1;k<=STEPS.length;k++){
